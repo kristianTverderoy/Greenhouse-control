@@ -21,17 +21,17 @@ public class HumiditySensor<T> implements Sensor<T> {
     }
     @Override
     public String getId() {
-        return "";
+        return this.id;
     }
 
     @Override
     public String getType() {
-        return "";
+        return this.type;
     }
 
     @Override
     public String getLocation() {
-        return "";
+        return this.location;
     }
 
     @Override
