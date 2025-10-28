@@ -12,6 +12,7 @@ public class TCPServer {
 
 
 
+
     public TCPServer(){
 
     }
@@ -26,6 +27,14 @@ public class TCPServer {
         }
     }
 
+    public void addSubscriber(ServerSubscriber subscriber){
+        this.serverSubscribers.add(subscriber);
+    }
 
+    public void notifySubscribers(){
+        for (ServerSubscriber subscriber : this.serverSubscribers){
+            subscriber.update();
+        }
+    }
 
 }
