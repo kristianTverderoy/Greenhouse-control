@@ -9,6 +9,7 @@ public class TCPServer {
     private ServerSocket listenerServerSocket;
     private int port;
     private List<ServerSubscriber> serverSubscribers;
+    private List<GreeenHouse> greenHouses;
 
 
 
