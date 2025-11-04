@@ -1,7 +1,7 @@
 package greenhouse.entities.sensors;
 
-public abstract class Sensor<T> implements SensorContract<T>{
-  private String id;
+public abstract class Sensor<T> implements SensorContract<T> {
+  private int id;
   private String type;
   private String location;
   private T currentReading;
@@ -11,33 +11,34 @@ public abstract class Sensor<T> implements SensorContract<T>{
   private boolean isActive;
   private boolean isConnected;
 
-  public Sensor(String type, String id, String location, T minimumReading, T maximumReading){
+  public Sensor(String type, int id, String location, T minimumReading, T maximumReading) {
     this.id = id;
     this.type = type;
     this.location = location;
     this.minimumReading = minimumReading;
     this.maximumReading = maximumReading;
   }
+
   @Override
-  public String getId() {
+  public int getId() {
     return this.id;
   }
 
   @Override
   public String getType() {
-    return "";
+    return this.type;
   }
 
   @Override
   public String getLocation() {
-    return "";
+    return this.location;
   }
 
   @Override
   public T getCurrentReading() {
-    if (this.currentReading == null){
+    if (this.currentReading == null) {
       throw new SensorNotYetActiveException("Current reading can not be read if the sensor does not have a " +
-              "reading to give");
+          "reading to give");
     }
     return currentReading;
   }
@@ -54,9 +55,9 @@ public abstract class Sensor<T> implements SensorContract<T>{
 
   @Override
   public T getAverageReading() {
-    if (this.averageReading == null){
+    if (this.averageReading == null) {
       throw new SensorNotYetActiveException("Average reading can not be read if the sensor does not have a" +
-              " reading to give");
+          " reading to give");
     }
     return this.averageReading;
   }
@@ -87,7 +88,7 @@ public abstract class Sensor<T> implements SensorContract<T>{
   }
 
   @Override
-  public void setThreshold(Object min, Object max) {
+  public void setThreshold(T min, T max) {
 
   }
 

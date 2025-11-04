@@ -2,7 +2,7 @@ package greenhouse.entities.sensors;
 
 public interface SensorContract<T> {
     // Identity and metadata
-    String getId();
+    int getId();
     String getType();
     String getLocation();
 

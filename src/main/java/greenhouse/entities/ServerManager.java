@@ -2,10 +2,11 @@ package greenhouse.entities;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerManager {
     private static ServerManager instance = null;
-    private final Map<String, TCPServer> servers = new HashMap<>(); //Holds all servers by name.
+    private final Map<String, TCPServer> servers = new ConcurrentHashMap<>(); //Holds all servers by name.
 
 
     private ServerManager(){
