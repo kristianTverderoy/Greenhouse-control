@@ -178,6 +178,7 @@ public abstract class Sensor<T> implements SensorContract<T>{
     return this.isConnected;
   }
 
+
   public abstract void start();
 
 
@@ -195,8 +196,8 @@ public abstract class Sensor<T> implements SensorContract<T>{
    * @param max the upper threshold limit
    */
   public void setThreshold(T min, T max) {
-    this.lowerLimit = min;
-    this.upperLimit = max;
+    this.lowEndRange = min;
+    this.highEndRange = max;
   }
 
   /**
