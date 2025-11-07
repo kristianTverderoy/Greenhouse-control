@@ -1,0 +1,210 @@
+package greenhouse.entities.sensors;
+
+/**
+ * Abstract base class for all sensor types in the greenhouse system.
+ * This class provides common functionality for managing sensor state, readings,
+ * and alert thresholds.
+ *
+ * @param <T> the type of data this sensor reads (e.g., Double, Integer)
+ */
+public abstract class Sensor<T> implements SensorContract<T>{
+  private int id;
+  private String type;
+  private String location;
+  private T currentReading;
+  private T lowEndRange;
+  private T highEndRange;
+  private T averageReading;
+  private boolean isActive;
+  private boolean isConnected;
+  private boolean isAlertState = false;
+
+
+  /**
+   * Constructs a new Sensor with the specified parameters.
+   *
+   * @param type the type of sensor (e.g., "temperature", "humidity", "soil moisture")
+   * @param id the unique identifier for this sensor
+   * @param location the physical location of the sensor in the greenhouse
+   * @param lowEndRange the minimum reading value this sensor can measure
+   * @param highEndRange the maximum reading value this sensor can measure
+   */
+  public Sensor(String type, int id, String location, T lowEndRange, T highEndRange){
+    this.id = id;
+    this.type = type;
+    this.location = location;
+    this.lowEndRange = lowEndRange;
+    this.highEndRange = highEndRange;
+  }
+
+  /**
+   * Sets the sensor's id to an int value
+   * @param newId The new unique identifier to assign to this sensor.
+   */
+  public void setId(int newId){
+    this.id = newId;
+  }
+
+  /**
+   * Updates the physical location of this sensor.
+   *
+   * @param newLocation the new location string
+   */
+  public void setLocation(String newLocation){
+    this.location = newLocation;
+  }
+
+  /**
+   * Sets the alert state of this sensor.
+   *
+   * @param newState true if the sensor is in alert state, false otherwise
+   */
+  public void setAlertState(boolean newState){
+    this.isAlertState = newState;
+  }
+
+  /**
+   * Updates the connection status of this sensor.
+   *
+   * @param newConnectionStatus true if connected, false if disconnected
+   */
+  public void setConnectionStatus(boolean newConnectionStatus){
+    this.isConnected = newConnectionStatus;
+  }
+
+  /**
+   * Activates this sensor, enabling it to take readings.
+   */
+  public void setActive(){
+    this.isActive = true;
+  }
+
+  /**
+   * Deactivates this sensor, disabling it from taking readings.
+   */
+  public void setInactive(){
+    this.isActive = false;
+  }
+
+  /**
+   * Gets the unique identifier of this sensor.
+   *
+   * @return the sensor's ID
+   */
+  public int getId() {
+    return this.id;
+  }
+
+
+  /**
+   * Gets the type of this sensor.
+   *
+   * @return the sensor type
+   */
+  public String getType() {
+    return this.type;
+  }
+
+  /**
+   * Gets the physical location of this sensor.
+   *
+   * @return the sensor's location
+   */
+  public String getLocation() {
+    return this.location;
+  }
+
+  /**
+   * Gets the current reading from this sensor.
+   *
+   * @return the current sensor reading
+   * @throws SensorNotYetActiveException if the sensor has no current reading available
+   */
+  public T getCurrentReading() {
+    if (this.currentReading == null){
+      throw new SensorNotYetActiveException("Current reading can not be read if the sensor does not have a " +
+              "reading to give");
+    }
+    return currentReading;
+  }
+
+  /**
+   * Gets the low-end value this sensor can take.
+   *
+   * @return the minimum value
+   */
+  public T getLowEndRangeValue() {
+    return this.lowEndRange;
+  }
+
+  /**
+   * Gets the high-end value this sensor can take.
+   *
+   * @return the high-end value
+   */
+  public T getMaxEndRangeValue() {
+    return this.highEndRange;
+  }
+
+  /**
+   * Gets the average of all readings taken by this sensor.
+   *
+   * @return the average reading
+   * @throws SensorNotYetActiveException if the sensor has no readings to calculate an average
+   */
+  public T getAverageReading() {
+    if (this.averageReading == null){
+      throw new SensorNotYetActiveException("Average reading can not be read if the sensor does not have a" +
+              " reading to give");
+    }
+    return this.averageReading;
+  }
+
+  /**
+   * Checks if this sensor is currently active.
+   *
+   * @return true if the sensor is active, false otherwise
+   */
+  public boolean isActive() {
+    return this.isActive;
+  }
+
+  /**
+   * Checks if this sensor is currently connected.
+   *
+   * @return true if the sensor is connected, false otherwise
+   */
+  public boolean isConnected() {
+    return this.isConnected;
+  }
+
+  public abstract void start();
+
+
+  public abstract void stop();
+
+
+  public void reset() {
+
+  }
+
+  /**
+   * Sets the threshold limits for alert triggering.
+   *
+   * @param min the lower threshold limit
+   * @param max the upper threshold limit
+   */
+  public void setThreshold(T min, T max) {
+    this.lowerLimit = min;
+    this.upperLimit = max;
+  }
+
+  /**
+   * Checks if this sensor is currently in an alert state.
+   *
+   * @return true if the sensor is in alert state, false otherwise
+   */
+  public boolean isInAlertState() {
+    return this.isAlertState;
+  }
+}
