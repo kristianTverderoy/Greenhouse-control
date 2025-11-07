@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TCPServer {
 
   private final int port;
-  private final List<ServerSubscriber> serverSubscribers = new CopyOnWriteArrayList<>();
+  private final List<Socket> subscribedClients = new CopyOnWriteArrayList<>();
   private final List<GreenHouse> greenHouses = new CopyOnWriteArrayList<>();
   private volatile boolean isOn = false;
   private ServerSocket serverSocket;
@@ -104,8 +104,8 @@ public class TCPServer {
    *
    * @param subscriber the subscriber to be added
    */
-  public void addSubscriber(ServerSubscriber subscriber){
-    this.serverSubscribers.add(subscriber);
+  public void addSubscriber(Socket subscriber) {
+    this.subscribedClients.add(subscriber);
   }
 
   /**
