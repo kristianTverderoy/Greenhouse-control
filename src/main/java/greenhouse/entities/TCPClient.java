@@ -11,8 +11,6 @@ import java.util.Scanner;
  */
 public class TCPClient implements ServerSubscriber{
   private Socket socket;
-  private String host;
-  private int port;
   private InputStreamReader inputStreamReader;
   private OutputStreamWriter outputStreamWriter;
   private BufferedReader bufferedReader;
@@ -20,15 +18,10 @@ public class TCPClient implements ServerSubscriber{
 
   /**
    * Constructs a TCPClient with the specified port, host, and server.
-   * @param port
-   * @param host
    */
-  public TCPClient(int port, String host){
-    this.host = host;
-    this.port = port;
+  public TCPClient(){}
 
-  }
-
+  //TODO: Remove sout statements when no longer necessary for debugging.
   public void connectToServer(String host, int port){
     try (Socket socket = new Socket(host, port);
          InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());

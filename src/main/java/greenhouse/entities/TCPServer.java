@@ -20,23 +20,31 @@ public class TCPServer {
    *
    * @param port the port number on which the server will listen for connections
    */
-  public TCPServer(int port) {
+  public TCPServer(int port) throws IllegalArgumentException {
+    if (port < 0 || port > 65535) {
+      throw new IllegalArgumentException("Port number must be between 0 and 65535.");
+    }
     this.port = port;
-
   }
-
   /**
    * Starts the server and begins accepting client connections.
    * This method runs in a loop while the server is on, accepting and handling clients.
    * The server socket is closed when the server stops or an exception occurs.
    */
+
+  //TODO: Remove sout statements when no longer necessary for debugging.
   public void run() {
+    if (!isOn){
+      startServer();
+    }
 
     try {
       serverSocket = new ServerSocket(port);
 
       while (isOn) {
+        System.out.println("Server is listening on port " + port);
         Socket clientSocket = serverSocket.accept();
+        System.out.println("New client connected: " + clientSocket.getInetAddress().getHostAddress());
         new Thread(() -> handleClient(clientSocket)).start(); // Handle each client in a separate thread
       }
     } catch (IOException e) {
@@ -45,6 +53,7 @@ public class TCPServer {
       }
     } finally {
       closeServer();
+
     }
   }
 
@@ -123,7 +132,10 @@ public class TCPServer {
         yield "Server started"; //yield is kinda return, but specifically for switch expressions
       }
       case "info" -> "Server information";
-      case "help" -> "Available commands: status, info, help";
+      case "help" -> {
+        System.out.println("Client asked for help");
+        yield "Available commands: status, info, help";
+      }
       default -> "Unknown command";
     };
   }
