@@ -1,26 +1,32 @@
 package greenhouse.entities;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
+
+/**
+ * TCPClient class represents a client that connects to a TCP server,
+ * sends and receives messages, and can subscribe to server updates.
+ */
 public class TCPClient implements ServerSubscriber{
   private Socket socket;
   private String host;
   private int port;
-  private TCPServer server;
   private InputStreamReader inputStreamReader;
   private OutputStreamWriter outputStreamWriter;
   private BufferedReader bufferedReader;
   private BufferedWriter bufferedWriter;
 
-  public TCPClient(int port, String host, TCPServer server){
+  /**
+   * Constructs a TCPClient with the specified port, host, and server.
+   * @param port
+   * @param host
+   */
+  public TCPClient(int port, String host){
     this.host = host;
     this.port = port;
-    this.server = server;
+
   }
 
   public void connectToServer(String host, int port){
@@ -57,8 +63,21 @@ public class TCPClient implements ServerSubscriber{
     }
   }
 
+  /**
+   * Subsribes this client to receive updates from the server by sending a subscribe command.
+   * The server is expected to handle the subscription logic.
+   */
   public void subscribeToServer(){
-    this.server.addSubscriber(this);
+    try {
+      bufferedWriter.write("subscribe");
+      bufferedWriter.newLine();
+      bufferedWriter.flush();
+
+      String response = bufferedReader.readLine();
+      System.out.println("Subscription response from server: " + response);
+    } catch (IOException e){
+      System.err.println("Failed to subscribe to server: " + e.getMessage());
+    }
   }
 
   public void update(){
