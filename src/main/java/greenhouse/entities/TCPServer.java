@@ -1,6 +1,7 @@
 package greenhouse.entities;
 
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.List;
 
@@ -21,8 +22,8 @@ public class TCPServer {
 
       ServerSocket serverSocket = new ServerSocket();
 
-    } catch(ServerSetupException e) {
-
+    } catch(ServerSetupException | IOException e) {
+      e.printStackTrace();
     }
   }
 
