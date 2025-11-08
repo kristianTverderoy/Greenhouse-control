@@ -36,6 +36,21 @@ public class TCPClient implements ServerSubscriber{
       this.bufferedReader = bufferedReader;
       this.bufferedWriter = bufferedWriter;
 
+      // Thread to listen for server messages:
+      Thread listenerThread = new Thread(() -> {
+        try {
+          String serverMessage;
+          while ((serverMessage = bufferedReader.readLine()) != null) {
+            System.out.println("Server: " + serverMessage);
+          }
+        } catch (IOException e) {
+          System.err.println("Connection to server lost: " + e.getMessage());
+          }
+        });
+      listenerThread.setDaemon(true);
+      listenerThread.start();
+
+      // Main loop only sends messages to server.
       boolean disconnected = false;
       while (!disconnected) {
 
@@ -44,15 +59,12 @@ public class TCPClient implements ServerSubscriber{
         bufferedWriter.newLine();
         bufferedWriter.flush();
 
-        String messageReceived = bufferedReader.readLine();
-        System.out.println("Message from server: " + messageReceived);
-
         if (messageToSend.equalsIgnoreCase("exit")){
           disconnected = true;
         }
       }
     } catch (Exception e){
-      e.printStackTrace();
+      System.err.println("Could not connect to server: " + e.getMessage());
     }
   }
 
