@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TCPServer {
 
   private final int port;
-  private final List<Socket> subscribedClients = new CopyOnWriteArrayList<>();
+  private final List<ClientConnection> subscribedClients = new CopyOnWriteArrayList<>();
   private final List<GreenHouse> greenHouses = new CopyOnWriteArrayList<>();
   private volatile boolean isOn = false;
   private ServerSocket serverSocket;
@@ -34,16 +34,16 @@ public class TCPServer {
 
   //TODO: Remove sout statements when no longer necessary for debugging.
   public void run() {
-    if (!isOn){
+    if (!isOn) {
       startServer();
     }
 
-    try {
-      serverSocket = new ServerSocket(port);
+    try (ServerSocket ss = new ServerSocket(port)) {
+      serverSocket = ss;
 
       while (isOn) {
         System.out.println("Server is listening on port " + port);
-        Socket clientSocket = serverSocket.accept();
+        Socket clientSocket = ss.accept();
         System.out.println("New client connected: " + clientSocket.getInetAddress().getHostAddress());
         new Thread(() -> handleClient(clientSocket)).start(); // Handle each client in a separate thread
       }
@@ -52,8 +52,8 @@ public class TCPServer {
         e.printStackTrace();
       }
     } finally {
-      closeServer();
-
+      // try-with-resources already closed the socket; clear the field reference for clarity
+      serverSocket = null;
     }
   }
 
@@ -61,35 +61,33 @@ public class TCPServer {
    * Handles communication with a connected client.
    * Reads messages from the client and processes them until the client disconnects
    * or sends an exit command.
-   *
+   * <p>
    * Upon receiving an exit command or a null message, the client is removed from the list of subscribed clients.
    *
    * @param clientSocket the socket connection to the client
    */
   private void handleClient(Socket clientSocket) {
 
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+    try (clientSocket; BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
          BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()))) {
+      try {
 
-      boolean clientConnected = true;
-      while (isOn && clientConnected && !clientSocket.isClosed()) {
-        String message = reader.readLine();
-        if (message == null || message.equalsIgnoreCase("exit")) {
-          clientConnected = false;
-          subscribedClients.remove(clientSocket);
-        } else {
-          handleClientRequest(clientSocket, message, writer);
+        boolean clientConnected = true;
+        while (isOn && clientConnected && !clientSocket.isClosed()) {
+          String message = reader.readLine();
+          if (message == null || message.equalsIgnoreCase("exit")) {
+            clientConnected = false;
+            removeSubscriber(clientSocket);
+          } else {
+            handleClientRequest(clientSocket, message, writer);
+          }
         }
+      } catch (IOException e) {
+        e.printStackTrace();
+
       }
     } catch (IOException e) {
       e.printStackTrace();
-
-    } finally {
-      try {
-        clientSocket.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
     }
   }
 
@@ -104,7 +102,11 @@ public class TCPServer {
   private void handleClientRequest(Socket clientSocket, String message, BufferedWriter writer) {
     try {
       if (message.equalsIgnoreCase("subscribe")) {
-        addSubscriber(clientSocket);
+        boolean alreadySubscribed = subscribedClients.stream()
+                .anyMatch(clientConnection -> clientConnection.socket().equals(clientSocket));
+        if (!alreadySubscribed){
+          addSubscriber(clientSocket, writer);
+        }
         writer.write("Subscribed successfully.");
       } else {
 
@@ -125,17 +127,16 @@ public class TCPServer {
    */
   private String handleMessage(String messageFromClient) {
     return switch (messageFromClient) {
-      case "status" -> "Server is running";
-      case "isOn" -> Boolean.toString(isOn);
-      case "start" -> {
-        startServer();
-        yield "Server started"; //yield is kinda return, but specifically for switch expressions
+      case "status" -> {
+        notifySubscribers("Server is running");
+        yield "Server is running";
+      }
+      case "isOn" -> {
+        notifySubscribers("Server isOn status requested");
+        yield Boolean.toString(isOn);
       }
       case "info" -> "Server information";
-      case "help" -> {
-        System.out.println("Client asked for help");
-        yield "Available commands: status, info, help";
-      }
+      case "help" -> "Available commands: status, info, help";
       default -> "Unknown command";
     };
   }
@@ -146,21 +147,34 @@ public class TCPServer {
    *
    * @param subscriber the subscriber to be added
    */
-  public void addSubscriber(Socket subscriber) {
-    this.subscribedClients.add(subscriber);
+  public void addSubscriber(Socket subscriber, BufferedWriter writer) {
+    this.subscribedClients.add(new ClientConnection(subscriber, writer));
   }
 
   /**
-   * Notifies all registered subscribers by calling their update method.
+   * Removes a subscriber from the subscriber list.
+   *
+   * @param subscriber the subscriber to be removed
+   */
+  private void removeSubscriber(Socket subscriber) {
+    this.subscribedClients.removeIf(
+            clientConnection -> clientConnection.socket().equals(subscriber));
+  }
+
+  /**
+   * Notifies all registered subscribers with the provided update message.
+   * The message is sent to each subscriber's writer, and
+   * is sent over the network connection.
+   * <p>
+   * If a notification fails to be sent to a subscriber,
+   * it's assumed the subscriber is no longer reachable and is removed from the list.
    */
   public void notifySubscribers(String updateMessage) {
-    subscribedClients.removeIf(clientSocket -> {
+    subscribedClients.removeIf(clientConnection -> {
       try {
-        BufferedWriter writer = new BufferedWriter(
-                new OutputStreamWriter(clientSocket.getOutputStream()));
-        writer.write(updateMessage);
-        writer.newLine();
-        writer.flush();
+        clientConnection.writer.write(updateMessage);
+        clientConnection.writer.newLine();
+        clientConnection.writer.flush();
         return false; // Notification sent successfully, i.e do not remove subscriber.
       } catch (IOException e) {
         return true; // There was an error in notifying the subscriber, so we remove it.
@@ -180,9 +194,9 @@ public class TCPServer {
    */
   public void stopServer() {
     this.isOn = false;
-    subscribedClients.forEach(socket -> {
+    subscribedClients.forEach(clientConnection -> {
       try {
-        socket.close();
+        clientConnection.socket().close();
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -191,6 +205,9 @@ public class TCPServer {
     closeServer();
   }
 
+  /**
+   * Closes the server socket to stop accepting new connections.
+   */
   private void closeServer() {
     try {
       if (serverSocket != null && !serverSocket.isClosed()) {
@@ -208,6 +225,33 @@ public class TCPServer {
   public boolean isOn() {
     return isOn;
   }
+
+
+  /**
+     * Record holding information about a client connection.
+     */
+    private record ClientConnection(Socket socket, BufferedWriter writer) {
+
+      /**
+       * Gets the socket connection to the client.
+       *
+       * @return the client socket
+       */
+      @Override
+      public Socket socket() {
+        return socket;
+      }
+
+      /**
+       * Gets the writer used to send messages to the client.
+       *
+       * @return the buffered writer
+       */
+      @Override
+      public BufferedWriter writer() {
+        return writer;
+      }
+    }
 
 
 }
