@@ -75,8 +75,8 @@ public class TCPServer {
 
         boolean clientConnected = true;
         while (isOn && clientConnected && !clientSocket.isClosed()) {
-          String message = reader.readLine();
-          if (message.equalsIgnoreCase("exit")) {
+          String message = reader.readLine(); // message is null if client abruptly disconnects
+          if (message == null || message.equalsIgnoreCase("exit")) {
             clientConnected = false;
             removeSubscriber(clientSocket);
           } else {
@@ -84,8 +84,9 @@ public class TCPServer {
           }
         }
       } catch (IOException e) {
-        e.printStackTrace();
-
+        // Client disconnected abruptly (e.g., connection reset)
+        removeSubscriber(clientSocket);
+        System.out.println("Client disconnected: " + clientSocket.getInetAddress().getHostAddress());
       }
     } catch (IOException e) {
       e.printStackTrace();
