@@ -39,8 +39,8 @@ public class Air implements Sensorable {
     }
 
     updateLight();
-    humidityUpProbability();
-    tempUpProbability();
+    humidityChangeProbability();
+    tempChangeProbability();
   }
 
   private void updateLight() {
@@ -52,14 +52,14 @@ public class Air implements Sensorable {
    * between current humidity and target humidity.
    */
 
-  private void humidityUpProbability() {
+  private void humidityChangeProbability() {
     float humidityIncreaseChance;
     if (Math.abs(humidity - humidityTarget) > 0.5) {
-      humidityIncreaseChance = 0.9f;
+      humidityIncreaseChance = 0.95f;
     } else if (Math.abs(humidity - humidityTarget) > 0.2) {
-      humidityIncreaseChance = 0.7f;
-    } else if (Math.abs(humidity - humidityTarget) > 0.05) {
-      humidityIncreaseChance = 0.55f;
+      humidityIncreaseChance = 0.85f;
+    } else if (Math.abs(humidity - humidityTarget) > 0.015) {
+      humidityIncreaseChance = 0.75f;
     } else {
       humidityIncreaseChance = 0.5f;
     }
@@ -71,7 +71,7 @@ public class Air implements Sensorable {
   }
 
   private void changeHumidity(float increaseChance) {
-    float humidityChange = (float) (Math.random() * 0.04); // 0-4%
+    float humidityChange = (float) ((Math.random() * 0.03) + 0.01); // 1-4%
     if (Math.random() < increaseChance) {
       humidity += humidityChange;
     } else {
@@ -84,14 +84,14 @@ public class Air implements Sensorable {
    * Simulates temperature change probability based on the difference
    * between current temperature and target temperature.
    */
-  private void tempUpProbability() {
+  private void tempChangeProbability() {
     float tempIncreaseChance;
     if (Math.abs(temperature - tempTarget) > 20) {
-      tempIncreaseChance = 0.9f;
+      tempIncreaseChance = 0.95f;
     } else if (Math.abs(temperature - tempTarget) > 10) {
-      tempIncreaseChance = 0.7f;
+      tempIncreaseChance = 0.85f;
     } else if (Math.abs(temperature - tempTarget) > 2) {
-      tempIncreaseChance = 0.55f;
+      tempIncreaseChance = 0.75f;
     } else {
       tempIncreaseChance = 0.5f;
     }
@@ -111,7 +111,7 @@ public class Air implements Sensorable {
    * @param increaseChance The chance to increase the temperature.
    */
   private void changeTemperature(float increaseChance) {
-    float temperatureChange = (float) (Math.random() * 2); // 0-2°C
+    float temperatureChange = (float) (Math.random() + 1); // 1-2°C
     if (Math.random() < increaseChance) {
       temperature += temperatureChange;
     } else temperature -= temperatureChange;
