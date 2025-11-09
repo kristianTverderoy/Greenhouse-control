@@ -38,7 +38,46 @@ public class Air implements Sensorable {
       initialTempSet = true;
     }
 
+    updateLight();
+    humidityUpProbability();
     tempUpProbability();
+  }
+
+  private void updateLight() {
+
+  }
+
+  /**
+   * Simulates humidity change probability based on the difference
+   * between current humidity and target humidity.
+   */
+
+  private void humidityUpProbability() {
+    float humidityIncreaseChance;
+    if (Math.abs(humidity - humidityTarget) > 0.5) {
+      humidityIncreaseChance = 0.9f;
+    } else if (Math.abs(humidity - humidityTarget) > 0.2) {
+      humidityIncreaseChance = 0.7f;
+    } else if (Math.abs(humidity - humidityTarget) > 0.05) {
+      humidityIncreaseChance = 0.55f;
+    } else {
+      humidityIncreaseChance = 0.5f;
+    }
+    if (humidity < humidityTarget) {
+      changeHumidity(humidityIncreaseChance);
+    } else {
+      changeHumidity(1 - humidityIncreaseChance);
+    }
+  }
+
+  private void changeHumidity(float increaseChance) {
+    float humidityChange = (float) (Math.random() * 0.04); // 0-4%
+    if (Math.random() < increaseChance) {
+      humidity += humidityChange;
+    } else {
+      humidity -= humidityChange;
+    }
+
   }
 
   /**
