@@ -181,14 +181,14 @@ public class TCPServer {
   /**
    * Updates the server state to "on", allowing it to start accepting connections in the run loop.
    */
-  public void startServer() {
+  public synchronized void startServer() {
     this.isOn = true;
   }
 
   /**
    * Updates the server state to "off", stopping it from accepting further connections in the run loop.
    */
-  public void stopServer() {
+  public synchronized void stopServer() {
     this.isOn = false;
     subscribedClients.forEach(clientConnection -> {
       try {
@@ -204,7 +204,7 @@ public class TCPServer {
   /**
    * Closes the server socket to stop accepting new connections.
    */
-  private void closeServer() {
+  private synchronized void closeServer() {
     try {
       if (serverSocket != null && !serverSocket.isClosed()) {
         serverSocket.close();
