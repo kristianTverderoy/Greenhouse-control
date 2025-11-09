@@ -41,6 +41,7 @@ public class TCPServer {
     try (ServerSocket ss = new ServerSocket(port)) {
       serverSocket = ss;
 
+
       while (isOn) {
         System.out.println("Server is listening on port " + port);
         Socket clientSocket = ss.accept();
@@ -75,7 +76,7 @@ public class TCPServer {
         boolean clientConnected = true;
         while (isOn && clientConnected && !clientSocket.isClosed()) {
           String message = reader.readLine();
-          if (message == null || message.equalsIgnoreCase("exit")) {
+          if (message.equalsIgnoreCase("exit")) {
             clientConnected = false;
             removeSubscriber(clientSocket);
           } else {
@@ -106,10 +107,10 @@ public class TCPServer {
                 .anyMatch(clientConnection -> clientConnection.socket().equals(clientSocket));
         if (!alreadySubscribed){
           addSubscriber(clientSocket, writer);
+          writer.write("Subscribed successfully.");
         }
-        writer.write("Subscribed successfully.");
-      } else {
 
+      } else {
         writer.write(handleMessage(message));
       }
       writer.newLine();
@@ -126,15 +127,9 @@ public class TCPServer {
    * @return The response message to be sent back to the client.
    */
   private String handleMessage(String messageFromClient) {
-    return switch (messageFromClient) {
-      case "status" -> {
-        notifySubscribers("Server is running");
-        yield "Server is running";
-      }
-      case "isOn" -> {
-        notifySubscribers("Server isOn status requested");
-        yield Boolean.toString(isOn);
-      }
+    return switch (messageFromClient.toLowerCase()) {
+      case "status" -> "Server is running";
+      case "ison" -> Boolean.toString(isOn);
       case "info" -> "Server information";
       case "help" -> "Available commands: status, info, help";
       default -> "Unknown command";
