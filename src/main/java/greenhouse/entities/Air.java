@@ -1,21 +1,77 @@
 package greenhouse.entities;
 
-public class Air implements Sensorable {
+public class Air extends ClockSubscriber implements Sensorable {
 
   private float humidity; // 0 <= x <= 1
-  private double light;
+  private double lux; //The amount of light in lux. Lux is a unit of illuminance per square meter.
   private double temperature;
-  private float humidityTarget;
-  private double tempTarget;
+  private Float humidityTarget;
+  private Double tempTarget;
+  private Double luxTarget;
   private boolean initialTempSet = false;
   private boolean initialLightSet = false;
   private boolean initialHumiditySet = false;
+  private int currentHour = 0;
 
+  /**
+   * Creates an instance of the Air, with target temperature,
+   * humidity and light level.
+   *
+   * @param tempTarget The target temperature of the air.
+   * @param humidityTarget The target humidity of the air.
+   * @param luxTarget The target light level of the air.
+   */
+  public Air(double tempTarget, float humidityTarget, double luxTarget){
+    this.tempTarget = tempTarget;
+    this.humidityTarget = humidityTarget;
+    this.luxTarget = luxTarget;
+    subscribe();
+  }
 
+  /**
+   * Creates an instance of the Air, with target temperature
+   * and humidity.
+   *
+   * @param tempTarget The target temperature of the air.
+   * @param humidityTarget The target humidity of the air.
+   */
   public Air(double tempTarget, float humidityTarget) {
     this.humidityTarget = humidityTarget;
     this.tempTarget = tempTarget;
+    this.luxTarget = null;
+    subscribe();
   }
+
+  /**
+   * Creates an instance of the Air, with target temperature.
+   *
+   * @param tempTarget The target temperature of the air.
+   */
+  public Air(double tempTarget){
+    this.tempTarget = tempTarget;
+    this.humidityTarget = 0.5f; // default humidity target
+    this.luxTarget = null;
+    subscribe();
+  }
+
+  /**
+   * Creates an instance of the Air, with target humidity.
+   *
+   * @param humidityTarget The target humidity of the air.
+   */
+  public Air(float humidityTarget){
+    this.humidityTarget = humidityTarget;
+    this.tempTarget = 18.0; // default temperature target
+    this.luxTarget = null;
+    subscribe();
+  }
+
+  @Override
+  void tick() {
+    currentHour = (currentHour + 1) % 24;
+  }
+
+
 
   /**
    * Interface method, to make all Sensorable objects update their state values.
@@ -28,13 +84,13 @@ public class Air implements Sensorable {
       initialHumiditySet = true;
     }
     // light (lux): 0.0 - 100000.0
-    if (light == 0.0 && !initialLightSet) {
-      light = (double) (Math.random() * 100000);
+    if (lux == 0.0 && !initialLightSet) {
+      lux = Math.random() * 100000;
       initialLightSet = true;
     }
     // temperature (°C): 0.0 - 40.0
     if (temperature == 0.0 && !initialTempSet) {
-      temperature = (double) (Math.random() * 40);
+      temperature = Math.random() * 40;
       initialTempSet = true;
     }
 
@@ -43,8 +99,19 @@ public class Air implements Sensorable {
     tempChangeProbability();
   }
 
+  /**
+   * Updates the light level based on a 24-hour sine wave pattern,
+   * and multiplying with a random value from 0.8 to 1.2,
+   * simulating natural daylight variations.
+   */
   private void updateLight() {
+    // Calculate base lux from 24-hour sine wave (range: 20 to 70,020 lux)
+    double randomMultiplier = 0.8 + Math.random() * 0.4;
+    double sineValue = Math.sin((currentHour / 24.0) * 2 * Math.PI - Math.PI / 2);
 
+    // Map sine wave from [-1, 1] to [30, 40,000] lux
+    // Multiplied by random multiplier to simulate weather variations
+    this.lux = randomMultiplier*(20015 + 19985 * sineValue);
   }
 
   /**
@@ -122,8 +189,8 @@ public float getHumidity() {
   return humidity;
 }
 
-public double getLight() {
-  return light;
+public double getLux() {
+  return lux;
 }
 
 public double getTemperature() {
