@@ -2,6 +2,7 @@ package greenhouse.entities;
 
 //import org.junit.jupiter.api.Assertions;
 
+import greenhouse.entities.sensors.TemperatureSensor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,6 +31,28 @@ public class AirTest {
     assertTrue(humidityChanges >= 10,  "Humidity changed " + humidityChanges + "/10 times");
     assertTrue(lightChanges >= 10, "Light changed " + lightChanges + "/10 times");
     assertTrue(tempChanges >= 10, "Temperature changed " + tempChanges + "/10 times");
+  }
+
+  @Test
+  public void stateValuesShouldConvergeTowardsTargetValues(){
+    Air air = new Air(40, 0.9f);
+    int convergedResultsTemp = 0;
+    int convergedResultsHumidity = 0;
+    for(int i = 0; i < 100; i++){
+      air.updateState();
+      if(Math.abs(air.getTemperature() - air.getTargetTemperature()) < 3.0){
+        convergedResultsTemp++;
+      }
+      if (Math.abs(air.getHumidity() - air.getTargetHumidity()) < 0.05f){
+        convergedResultsHumidity++;
+      }
+      air.tick();
+    }
+    assertTrue(convergedResultsHumidity >= 80,
+            "Humidity converged " + convergedResultsHumidity + "/100 times");
+
+    assertTrue(convergedResultsTemp >= 80,
+            "Temperature converged " + convergedResultsTemp + "/100 times");
   }
 }
 
