@@ -9,10 +9,7 @@ import java.util.Scanner;
  * TCPClient class represents a client that connects to a TCP server,
  * sends and receives messages, and can subscribe to server updates.
  */
-public class TCPClient implements ServerSubscriber{
-  private Socket socket;
-  private InputStreamReader inputStreamReader;
-  private OutputStreamWriter outputStreamWriter;
+public class TCPClient {
   private BufferedReader bufferedReader;
   private BufferedWriter bufferedWriter;
 
@@ -30,9 +27,6 @@ public class TCPClient implements ServerSubscriber{
          BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
          Scanner scanner = new Scanner(System.in)) {
 
-      this.socket = socket;
-      this.inputStreamReader = inputStreamReader;
-      this.outputStreamWriter = outputStreamWriter;
       this.bufferedReader = bufferedReader;
       this.bufferedWriter = bufferedWriter;
 
@@ -69,7 +63,7 @@ public class TCPClient implements ServerSubscriber{
   }
 
   /**
-   * Subsribes this client to receive updates from the server by sending a subscribe command.
+   * Subscribes this client to receive updates from the server by sending a subscribe command.
    * The server is expected to handle the subscription logic.
    */
   public void subscribeToServer(){
