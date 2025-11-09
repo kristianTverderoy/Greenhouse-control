@@ -1,5 +1,7 @@
 package greenhouse.entities.entrypoints;
 
+import greenhouse.entities.TCPServer;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 
@@ -18,16 +20,16 @@ public class ServerApp {
    */
   public static void main(String[] args) {
     try {
-      ServerSocket serverSocket = new ServerSocket(serverPort, 10);
-
-    } catch (NullPointerException e){
-
-
-    } catch (IOException e){
-
+//      ServerSocket serverSocket = new ServerSocket(serverPort, 10);
+      TCPServer server = new TCPServer(serverPort);
+      server.run();
     } catch (IllegalArgumentException e){
       System.err.println("ServerPort needs to be within the range 0-65535, "
               + "but it was tried to set to: " + serverPort);
+
+    } catch (Exception e){
+      System.err.println("There was an error while trying to start the server: " + e.getMessage());
+
     }
   }
 }
