@@ -7,6 +7,9 @@ import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import greenhouse.entities.sensors.HumiditySensor;
+import greenhouse.entities.sensors.SensorNotAddedToGreenHouseException;
+
 public class TCPServer {
 
   private final int port;
@@ -127,14 +130,68 @@ public class TCPServer {
    * @return The response message to be sent back to the client.
    */
   private String handleMessage(String messageFromClient) {
-    return switch (messageFromClient.toLowerCase()) {
+    String message = messageFromClient.toLowerCase().trim();
+    if (message.startsWith("addsensor")){
+      try {
+      addSensorsToGreenhouse(message);
+      return "The sensor(s) was added succesfully";
+      } catch (SensorNotAddedToGreenHouseException e){
+        return "There was a problem adding the sensor to the exception.";
+      }
+      
+    }
+    return switch (message) {
       case "status" -> "Server is running";
       case "ison" -> Boolean.toString(isOn);
       case "info" -> "Server information";
-      case "help" -> "Available commands: status, info, help";
+      case "help" -> "Available commands: Status, IsOn, Info, Help, AvailableSensors";
+      case "availablesensors" -> "'HumiditySensor', 'LightSensor', 'MotionSensor', 'PHSensor', 'TemperatureSensor'" + "\n" 
+      + "Example: 'AddSensors -HumiditySensor' this adds a humidity sensor to the greenhouse. \n \n 'AddSensors -LightSensor HumiditySensor MotionSensor'."
+      + " This adds multiple sensors at the same time.";
+      case "newgreenhouse" -> {
+        if (greenHouses.isEmpty()){
+            createNewGreenhouse();
+            yield "Your greenhouse was created successfully";
+          } else {
+        yield "There is only support for having one greenhouse currently.";
+        }
+      }
       default -> "Unknown command";
     };
   }
+
+  /**
+   * Creates a new greenhouse and adds it to the threadsafe array list.
+   */
+  private void createNewGreenhouse(){
+    GreenHouse gh = new GreenHouse();
+    this.greenHouses.add(gh);
+  }
+
+  private void addSensorsToGreenhouse(String message) throws SensorNotAddedToGreenHouseException {
+    String[] parts = message.split("-");
+    String[] commands = parts[2].split(" ");
+    
+    for (String command : commands) {
+      if ("HumiditySensor".equalsIgnoreCase(command)){
+        this.greenHouses.get(0).addSensor(
+          new HumiditySensor<>(
+            this.greenHouses.get(0).getNextAvailableSensorId(),
+           0.0f,
+           1.0f
+            ));
+
+      } else if ("LightSensor".equalsIgnoreCase(command)){
+
+      } else if ("MotionSensor".equalsIgnoreCase(command)){
+
+      } else if ("PHSensor".equalsIgnoreCase(command)){
+
+      } else if ("TemperatureSensor".equalsIgnoreCase(command)){
+
+      }
+      }
+    }
 
 
   /**
