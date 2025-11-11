@@ -4,7 +4,6 @@ public interface SensorContract<T> {
     // Identity and metadata
     int getId();
     String getType();
-    String getLocation();
 
     // Core functionality
     T getCurrentReading();
