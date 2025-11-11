@@ -10,7 +10,6 @@ package greenhouse.entities.sensors;
 public abstract class Sensor<T> implements SensorContract<T>{
   private int id;
   private String type;
-  private String location;
   private T currentReading;
   private T lowEndRange;
   private T highEndRange;
@@ -25,14 +24,12 @@ public abstract class Sensor<T> implements SensorContract<T>{
    *
    * @param type the type of sensor (e.g., "temperature", "humidity", "soil moisture")
    * @param id the unique identifier for this sensor
-   * @param location the physical location of the sensor in the greenhouse
    * @param lowEndRange the minimum reading value this sensor can measure
    * @param highEndRange the maximum reading value this sensor can measure
    */
-  public Sensor(String type, int id, String location, T lowEndRange, T highEndRange){
+  public Sensor(String type, int id, T lowEndRange, T highEndRange){
     this.id = id;
     this.type = type;
-    this.location = location;
     this.lowEndRange = lowEndRange;
     this.highEndRange = highEndRange;
   }
@@ -45,14 +42,6 @@ public abstract class Sensor<T> implements SensorContract<T>{
     this.id = newId;
   }
 
-  /**
-   * Updates the physical location of this sensor.
-   *
-   * @param newLocation the new location string
-   */
-  public void setLocation(String newLocation){
-    this.location = newLocation;
-  }
 
   /**
    * Sets the alert state of this sensor.
@@ -105,14 +94,6 @@ public abstract class Sensor<T> implements SensorContract<T>{
     return this.type;
   }
 
-  /**
-   * Gets the physical location of this sensor.
-   *
-   * @return the sensor's location
-   */
-  public String getLocation() {
-    return this.location;
-  }
 
   /**
    * Gets the current reading from this sensor.
@@ -177,7 +158,6 @@ public abstract class Sensor<T> implements SensorContract<T>{
   public boolean isConnected() {
     return this.isConnected;
   }
-
 
   public abstract void start();
 
