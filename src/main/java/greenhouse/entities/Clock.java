@@ -1,6 +1,7 @@
 package greenhouse.entities;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -16,10 +17,14 @@ public class Clock {
   private static int NORMAL = 10;
   private static int MODERATE = 5;
   private static int FAST = 1;
+  private ArrayList<Integer> speeds = new ArrayList<>(Arrays.asList(NORMAL, MODERATE, FAST));
+  private int position;
+  private int currentRate;
 
-  private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+  private ScheduledExecutorService scheduler;
+  private boolean on;
+
   private static Clock clock = null;
-
   private ArrayList<ClockSubscriber> subscribers;
 
   /**
@@ -27,13 +32,18 @@ public class Clock {
    */
   private Clock() {
     subscribers = new ArrayList<>();
+    on = false;
   }
 
   /**
-   * Starts the clock with normal tick speed as default.
+   * Starts the clock with normal tick speed (10 min) as default.
    */
   public void start() {
+    scheduler = Executors.newScheduledThreadPool(1);
     scheduler.scheduleAtFixedRate(tick(), 0, NORMAL, TimeUnit.MINUTES);
+    position = 0;
+    currentRate = NORMAL;
+    on = true;
   }
 
   /**
@@ -41,6 +51,72 @@ public class Clock {
    */
   public void stop() {
     scheduler.shutdown();
+    on = false;
+  }
+
+  /**
+   * Changes the rate at which the clock ticks.
+   *
+   * @param newRate The new tick rate of the clock.
+   */
+  public void changeRate(int newRate) {
+    scheduler.scheduleAtFixedRate(tick(), 0, newRate, TimeUnit.MINUTES);
+    currentRate = newRate;
+  }
+
+  /**
+   * Speeds up the rate the clock ticks at between three predetermined
+   * tick rates; 10 min, 5 min and 1 min.
+   *
+   * @param jump The jump increase between the predetermined tick rates.
+   *             Can only be 1 or 2
+   */
+  public void speedUp(int jump) {
+    if (jump < 1 || jump > 2) {
+      throw new IllegalArgumentException("Rate of change must be 1 or 2");
+    }
+    if (!on) {
+      throw new IllegalStateException("Clock is not on yet");
+    }
+    if (position + jump < speeds.size()) {
+      position += jump;
+    }
+    else {
+      position = speeds.size() - 1;
+    }
+    changeRate(speeds.get(position));
+  }
+
+  /**
+   * Slows down the rate the clock ticks at between three predetermined
+   * tick rates; 10 min, 5 min and 1 min.
+   *
+   * @param jump The jump decrease between the predetermined tick rates.
+   *             Can only be 1 or 2.
+   */
+  public void slowDown(int jump) {
+    if (jump < 1 || jump > 2) {
+      throw new IllegalArgumentException("Rate of change must be 1 or 2");
+    }
+    if (!on) {
+      throw new IllegalStateException("Clock is not on yet");
+    }
+    if (position - jump >= 0) {
+      position -= jump;
+    }
+    else {
+      position = 0;
+    }
+    changeRate(speeds.get(position));
+  }
+
+  /**
+   * Returns the rate the clock ticks at.
+   *
+   * @return The rate the clock ticks at.
+   */
+  public int getCurrentRate() {
+    return currentRate;
   }
 
   /**

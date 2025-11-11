@@ -3,7 +3,7 @@ package greenhouse.entities;
 /**
  * Subscribes to the Clock and does an action when the clock ticks.
  */
-abstract class ClockSubscriber {
+public abstract class ClockSubscriber {
 
   /**
    * Does an action when the Clock ticks.
