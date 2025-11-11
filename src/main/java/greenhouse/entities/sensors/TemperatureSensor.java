@@ -1,9 +1,9 @@
 package greenhouse.entities.sensors;
 
-public class TemperatureSensor<T> extends Sensor<T> {
+public class TemperatureSensor<T> extends Sensor<T>{
 
 
-  public TemperatureSensor(int id, T minimumReading, T maximumReading) {
+  public TemperatureSensor(int id) {
     super("TemperatureSensor", id);
   }
 

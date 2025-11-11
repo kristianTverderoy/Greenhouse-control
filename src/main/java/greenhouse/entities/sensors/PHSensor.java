@@ -1,11 +1,11 @@
 package greenhouse.entities.sensors;
 
-public class PHSensor<T> extends Sensor<T>{
+public class PHSensor<T> extends Sensor<T> {
 
     private double latestPhReading;
 //    private PHActuator actuator;
 
-    public PHSensor(int id, T minimumReading, T maximumReading) {
+    public PHSensor(int id) {
         super("PHSensor", id);
     }
 

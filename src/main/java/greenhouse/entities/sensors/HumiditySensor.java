@@ -1,9 +1,9 @@
 package greenhouse.entities.sensors;
 
-public class HumiditySensor<T> extends Sensor<T>{
+public class HumiditySensor<T> extends Sensor<T> {
 
 
-    public HumiditySensor(int id, T minimumReading, T maximumReading) {
+    public HumiditySensor(int id) {
         super("HumiditySensor", id);
     }
 
