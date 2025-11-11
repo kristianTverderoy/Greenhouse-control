@@ -5,11 +5,6 @@ public interface SensorContract<T> {
     int getId();
     String getType();
 
-    // Core functionality
-    T getCurrentReading();
-    T getLowEndRangeValue();
-    T getMaxEndRangeValue();
-    T getAverageReading();
 
     // Status and lifecycle
     boolean isActive();
@@ -19,6 +14,5 @@ public interface SensorContract<T> {
     void reset();
 
     // Configuration
-    void setThreshold(T min, T max);
     boolean isInAlertState();
 }

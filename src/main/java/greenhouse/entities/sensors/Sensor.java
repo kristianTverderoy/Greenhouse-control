@@ -11,8 +11,6 @@ public abstract class Sensor<T> implements SensorContract<T>{
   private int id;
   private String type;
   private T currentReading;
-  private T lowEndRange;
-  private T highEndRange;
   private T averageReading;
   private boolean isActive;
   private boolean isConnected;
@@ -24,14 +22,10 @@ public abstract class Sensor<T> implements SensorContract<T>{
    *
    * @param type the type of sensor (e.g., "temperature", "humidity", "soil moisture")
    * @param id the unique identifier for this sensor
-   * @param lowEndRange the minimum reading value this sensor can measure
-   * @param highEndRange the maximum reading value this sensor can measure
    */
-  public Sensor(String type, int id, T lowEndRange, T highEndRange){
+  public Sensor(String type, int id){
     this.id = id;
     this.type = type;
-    this.lowEndRange = lowEndRange;
-    this.highEndRange = highEndRange;
   }
 
   /**
@@ -109,23 +103,6 @@ public abstract class Sensor<T> implements SensorContract<T>{
     return currentReading;
   }
 
-  /**
-   * Gets the low-end value this sensor can take.
-   *
-   * @return the minimum value
-   */
-  public T getLowEndRangeValue() {
-    return this.lowEndRange;
-  }
-
-  /**
-   * Gets the high-end value this sensor can take.
-   *
-   * @return the high-end value
-   */
-  public T getMaxEndRangeValue() {
-    return this.highEndRange;
-  }
 
   /**
    * Gets the average of all readings taken by this sensor.
@@ -169,16 +146,6 @@ public abstract class Sensor<T> implements SensorContract<T>{
 
   }
 
-  /**
-   * Sets the threshold limits for alert triggering.
-   *
-   * @param min the lower threshold limit
-   * @param max the upper threshold limit
-   */
-  public void setThreshold(T min, T max) {
-    this.lowEndRange = min;
-    this.highEndRange = max;
-  }
 
   /**
    * Checks if this sensor is currently in an alert state.
