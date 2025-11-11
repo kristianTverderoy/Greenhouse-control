@@ -63,15 +63,6 @@ public class AirTest {
             "Temperature converged " + convergedResultsTemp + " times. >= 45 required.");
   }
 
-  @Test
-  public void highTemperatureLowersCurtains() {
-    Air air = new Air(30, 0.5f);
-    Curtain curtain = new Curtain(false); //Curtain(isDown = false)
-    Clock.getInstance().speedUp(2);
 
-    curtain.rollDown(true);
-
-    //TODO: fix arrange and do assert
-  }
 }
 
