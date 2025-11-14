@@ -151,9 +151,10 @@ public class TCPServer {
       case "ison" -> Boolean.toString(isOn);
       case "info" -> "Server information";
       case "help" -> "Available commands: Status, GetAllGreenHouses, IsOn, Info, Help, AvailableSensors";
-      case "availablesensors" -> "'HumiditySensor', 'LightSensor', 'MotionSensor', 'PHSensor', 'TemperatureSensor'" + "\n" 
-      + "Example: 'AddSensors -HumiditySensor' this adds a humidity sensor to the greenhouse. \n \n Example for multiple sensors: 'AddSensors -LightSensor HumiditySensor MotionSensor'."
-      + " This adds multiple sensors at the same time.";
+      case "availablesensors" -> "'HumiditySensor', 'LightSensor', 'MotionSensor', 'PHSensor', 'TemperatureSensor'"
+              +"Example: 'AddSensors -0 HumiditySensor ' this adds a humidity sensor to greenhouse nr.0."
+              + " \n \n Example for multiple sensors: 'AddSensors -2 -LightSensor HumiditySensor MotionSensor'."
+      + " This adds multiple sensors at the same time, to Greenhouse nr.2.";
       case "newgreenhouse" -> createNewGreenhouse();
       default -> "Unknown command";
     };
@@ -186,28 +187,32 @@ public class TCPServer {
     boolean splitSuccessful = false;
     try {
     String[] parts = message.split("-");
+    int greenhouseId = Integer.parseInt(parts[1].trim());
     String[] sensors = parts[1].split(" ");
 
 
-
+      GreenHouse targetGreenhouse = greenHouses.stream()
+              .filter(gh -> gh.getID() == greenhouseId)
+              .findFirst()
+              .orElseThrow(NoExistingGreenHouseException::new);
 
     for (String sensor : sensors) {
 
-        switch(sensor){
-        case "humiditysensor" -> this.greenHouses.getFirst().addSensor(new HumiditySensor<>(
-                this.greenHouses.getFirst().getNextAvailableSensorId()));
+      switch(sensor){
+        case "humiditysensor" -> targetGreenhouse.addSensor(new HumiditySensor<>(
+                targetGreenhouse.getNextAvailableSensorId()));
 
-        case "lightsensor" -> this.greenHouses.getFirst().addSensor(new LightSensor<>(
-                this.greenHouses.getFirst().getNextAvailableSensorId()));
+        case "lightsensor" -> targetGreenhouse.addSensor(new LightSensor<>(
+                targetGreenhouse.getNextAvailableSensorId()));
 
-        case "motionsensor" -> this.greenHouses.getFirst().addSensor(new MotionSensor<>(
-                this.greenHouses.getFirst().getNextAvailableSensorId()));
+        case "motionsensor" -> targetGreenhouse.addSensor(new MotionSensor<>(
+                targetGreenhouse.getNextAvailableSensorId()));
 
-        case "phsensor" -> this.greenHouses.getFirst().addSensor(new PHSensor<>(
-                this.greenHouses.getFirst().getNextAvailableSensorId()));
+        case "phsensor" -> targetGreenhouse.addSensor(new PHSensor<>(
+                targetGreenhouse.getNextAvailableSensorId()));
 
-        case "temperaturesensor" -> this.greenHouses.getFirst().addSensor(new TemperatureSensor<>(
-                this.greenHouses.getFirst().getNextAvailableSensorId()));
+        case "temperaturesensor" -> targetGreenhouse.addSensor(new TemperatureSensor<>(
+                targetGreenhouse.getNextAvailableSensorId()));
 
           default -> throw new SensorNotAddedToGreenHouseException();
       }
