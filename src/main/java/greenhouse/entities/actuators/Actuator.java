@@ -7,7 +7,7 @@ package greenhouse.entities.actuators;
 public abstract class Actuator {
   private String type;
   private int id;
-  private boolean isOn = false;
+  protected boolean isOn = false;
 
   /**
    * Constructs a new Actuator with the specified parameters.
