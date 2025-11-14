@@ -164,7 +164,7 @@ public class TCPServer {
       case "help" -> "Available commands: Status, GetAllGreenHouses, IsOn, Info, Help, AvailableSensors";
       case "availablesensors" -> "'HumiditySensor', 'LightSensor', 'PHSensor', 'TemperatureSensor'"
               +"Example: 'AddSensors -0 HumiditySensor ' this adds a humidity sensor to greenhouse nr.0."
-              + " \n \n Example for multiple sensors: 'AddSensors -2 -LightSensor HumiditySensor MotionSensor'."
+              + " \n \n Example for multiple sensors: 'AddSensors -2 -LightSensor HumiditySensor TemperatureSensor'."
               + " This adds multiple sensors at the same time, to Greenhouse nr.2.";
       case "newgreenhouse" -> createNewGreenhouse();
       default -> "Unknown command";
