@@ -147,20 +147,14 @@ public class TCPServer {
     }
     return switch (message) {
       case "status" -> "Server is running";
+      case "getallgreenhouses" -> getListOfAllGreenHouses();
       case "ison" -> Boolean.toString(isOn);
       case "info" -> "Server information";
-      case "help" -> "Available commands: Status, IsOn, Info, Help, AvailableSensors";
+      case "help" -> "Available commands: Status, GetAllGreenHouses, IsOn, Info, Help, AvailableSensors";
       case "availablesensors" -> "'HumiditySensor', 'LightSensor', 'MotionSensor', 'PHSensor', 'TemperatureSensor'" + "\n" 
       + "Example: 'AddSensors -HumiditySensor' this adds a humidity sensor to the greenhouse. \n \n Example for multiple sensors: 'AddSensors -LightSensor HumiditySensor MotionSensor'."
       + " This adds multiple sensors at the same time.";
-      case "newgreenhouse" -> {
-        if (greenHouses.isEmpty()){
-            createNewGreenhouse();
-            yield "Your greenhouse was created successfully";
-          } else {
-        yield "There is only support for having one greenhouse currently.";
-        }
-      }
+      case "newgreenhouse" -> createNewGreenhouse();
       default -> "Unknown command";
     };
   }
@@ -168,9 +162,20 @@ public class TCPServer {
   /**
    * Creates a new greenhouse and adds it to the threadsafe array list.
    */
-  private void createNewGreenhouse(){
-    GreenHouse gh = new GreenHouse();
+  private String createNewGreenhouse(){
+    try {GreenHouse gh;
+    if(!greenHouses.isEmpty()) {
+      gh = new GreenHouse(greenHouses.getLast().getID() + 1);
+
+    } else {
+      gh = new GreenHouse(0);
+    }
     this.greenHouses.add(gh);
+    return "GreenHouse created successfully.";
+    } catch (Exception e) {
+      return "There was an error creating a new green house. Please try again.";
+    }
+
   }
 
   private void addSensorsToGreenhouse(String message) throws SensorNotAddedToGreenHouseException, NoExistingGreenHouseException, IOException {
@@ -213,6 +218,17 @@ public class TCPServer {
     }
       }
 
+  /**
+   * Returns the name of all the green houses as one string
+   * @return name of all the green houses as one string
+   */
+  public String getListOfAllGreenHouses(){
+    StringBuilder result = new StringBuilder();
+    for(GreenHouse greenHouse : greenHouses) {
+      result.append("Greenhouse ").append(greenHouse.getID()).append(", ");
+    }
+    return result.toString().trim();
+  }
 
 
   /**
