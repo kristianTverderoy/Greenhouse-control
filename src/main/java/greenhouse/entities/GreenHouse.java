@@ -1,7 +1,6 @@
 package greenhouse.entities;
 
 import greenhouse.entities.sensors.Sensor;
-import greenhouse.entities.sensors.SensorContract;
 
 import java.util.List;
 import java.util.Map;
