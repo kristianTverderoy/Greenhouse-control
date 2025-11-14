@@ -1,10 +1,10 @@
 package greenhouse.entities.sensors;
 
-public class TemperatureSensor<T> extends Sensor<T> {
+public class TemperatureSensor<T> extends Sensor<T>{
 
 
-  public TemperatureSensor(int id, String location, T minimumReading, T maximumReading) {
-    super("TemperatureSensor", id, location, minimumReading, maximumReading);
+  public TemperatureSensor(int id) {
+    super("TemperatureSensor", id);
   }
 
   @Override
@@ -14,6 +14,6 @@ public class TemperatureSensor<T> extends Sensor<T> {
 
   @Override
   public void stop() {
-
+    
   }
 }
