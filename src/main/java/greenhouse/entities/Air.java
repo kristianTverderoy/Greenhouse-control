@@ -4,9 +4,11 @@ public class Air extends ClockSubscriber implements Sensorable {
 
   private float humidity; // 0 <= x <= 1
   private double lux; //The amount of light in lux. Lux is a unit of illuminance per square meter.
-  private double temperature;
+  private double actualTemperature;
+  private Double temperatureTarget;
+  private final double defaultTemperature = 15;
   private Float humidityTarget;
-  private Double tempTarget;
+  private final float defaultHumidity = 0.65f;
   private Double luxTarget;
   private boolean initialTempSet = false;
   private boolean initialLightSet = false;
@@ -22,7 +24,7 @@ public class Air extends ClockSubscriber implements Sensorable {
    * @param luxTarget      The target light level of the air.
    */
   public Air(double tempTarget, float humidityTarget, double luxTarget) {
-    this.tempTarget = tempTarget;
+    this.temperatureTarget = tempTarget;
     this.humidityTarget = humidityTarget;
     this.luxTarget = luxTarget;
     subscribe();
@@ -37,7 +39,7 @@ public class Air extends ClockSubscriber implements Sensorable {
    */
   public Air(double tempTarget, float humidityTarget) {
     this.humidityTarget = humidityTarget;
-    this.tempTarget = tempTarget;
+    this.temperatureTarget = tempTarget;
     this.luxTarget = null;
     subscribe();
   }
@@ -48,7 +50,7 @@ public class Air extends ClockSubscriber implements Sensorable {
    * @param tempTarget The target temperature of the air.
    */
   public Air(double tempTarget) {
-    this.tempTarget = tempTarget;
+    this.temperatureTarget = tempTarget;
     this.humidityTarget = 0.5f; // default humidity target
     this.luxTarget = null;
     subscribe();
@@ -61,7 +63,7 @@ public class Air extends ClockSubscriber implements Sensorable {
    */
   public Air(float humidityTarget) {
     this.humidityTarget = humidityTarget;
-    this.tempTarget = 18.0; // default temperature target
+    this.temperatureTarget = defaultTemperature; // default temperature target
     this.luxTarget = null;
     subscribe();
   }
@@ -89,8 +91,8 @@ public class Air extends ClockSubscriber implements Sensorable {
       initialLightSet = true;
     }
     // temperature (°C): 0.0 - 40.0
-    if (temperature == 0.0 && !initialTempSet) {
-      temperature = Math.random() * 40;
+    if (actualTemperature == 0.0 && !initialTempSet) {
+      actualTemperature = Math.random() * 40;
       initialTempSet = true;
     }
 
@@ -153,17 +155,17 @@ public class Air extends ClockSubscriber implements Sensorable {
    */
   private void tempChangeProbability() {
     float tempIncreaseChance;
-    if (Math.abs(temperature - tempTarget) > 20) {
+    if (Math.abs(actualTemperature - temperatureTarget) > 20) {
       tempIncreaseChance = 0.97f;
-    } else if (Math.abs(temperature - tempTarget) > 10) {
+    } else if (Math.abs(actualTemperature - temperatureTarget) > 10) {
       tempIncreaseChance = 0.92f;
-    } else if (Math.abs(temperature - tempTarget) > 2) {
+    } else if (Math.abs(actualTemperature - temperatureTarget) > 2) {
       tempIncreaseChance = 0.85f;
     } else {
       tempIncreaseChance = 0.5f;
     }
 
-    if (temperature < tempTarget) {
+    if (actualTemperature < temperatureTarget) {
       changeTemperature(tempIncreaseChance);
     } else {
       changeTemperature(1 - tempIncreaseChance);
@@ -180,10 +182,19 @@ public class Air extends ClockSubscriber implements Sensorable {
   private void changeTemperature(float increaseChance) {
     float temperatureChange = (float) (Math.random() + 0.25); // 0.25-1.25°C
     if (Math.random() < increaseChance) {
-      temperature += temperatureChange;
-    } else temperature -= temperatureChange;
+      actualTemperature += temperatureChange;
+    } else {
+      actualTemperature -= temperatureChange;
+    }
+    
   }
 
+  /**
+   * Sets the targetTemperature to a new desired temperature.
+   */
+  public void setTargetTemperature(double newTemperatureTarget) {
+    this.temperatureTarget = newTemperatureTarget;
+  }
 
   public float getHumidity() {
     return humidity;
@@ -194,7 +205,7 @@ public class Air extends ClockSubscriber implements Sensorable {
   }
 
   public double getTemperature() {
-    return temperature;
+    return actualTemperature;
   }
 
   public Float getTargetHumidity() {
@@ -202,7 +213,7 @@ public class Air extends ClockSubscriber implements Sensorable {
   }
 
   public Double getTargetTemperature() {
-    return tempTarget;
+    return temperatureTarget;
   }
 
   public Double getLuxTarget() {
