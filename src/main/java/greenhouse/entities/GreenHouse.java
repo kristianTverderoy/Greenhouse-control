@@ -25,8 +25,8 @@ public class GreenHouse {
     return this.greenHouseID;
   }
 
-  public void getSensor(int id) {
-    this.sensors.get(id);
+  public Sensor<?> getSensor(int id) {
+    return this.sensors.get(id);
   }
 
   /**
@@ -40,5 +40,9 @@ public class GreenHouse {
     return sensors.size();
   }
 
-
+  public String getAllSensorsInformation() {
+    StringBuilder sb = new StringBuilder();
+    sensors.forEach((id, sensor) -> sb.append(sensor.toString()).append("\n"));
+    return sb.toString();
+  }
 }
