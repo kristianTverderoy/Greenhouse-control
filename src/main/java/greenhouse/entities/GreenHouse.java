@@ -9,15 +9,21 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GreenHouse {
 
-  Map<Integer, Sensor<?>> sensors;
-  List<Sensorable> sensorableObjects;
+  private final Map<Integer, Sensor<?>> sensors;
+  private List<Sensorable> sensorableObjects;
+  private final int greenHouseID;
 
-  public GreenHouse() {
+  public GreenHouse(int greenHouseID) {
     this.sensors = new ConcurrentHashMap<>();
+    this.greenHouseID = greenHouseID;
   }
 
   public void addSensor(Sensor<?> sensor) {
     this.sensors.put(sensor.getId(), sensor);
+  }
+
+  public int getID(){
+    return this.greenHouseID;
   }
 
   public void getSensor(int id) {
@@ -34,4 +40,6 @@ public class GreenHouse {
   public int getNextAvailableSensorId(){
     return sensors.size();
   }
+
+
 }
