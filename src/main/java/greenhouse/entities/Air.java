@@ -70,7 +70,7 @@ public class Air extends ClockSubscriber implements Sensorable {
 
   @Override
   void tick() {
-    currentHour = (currentHour + 1) % 24;
+    updateState();
   }
 
 
@@ -79,6 +79,7 @@ public class Air extends ClockSubscriber implements Sensorable {
    */
   @Override
   public void updateState() {
+    currentHour = (currentHour + 1) % 24;
     // humidity: 0.0 - 1.0
     if (humidity == 0.0f && !initialHumiditySet) {
       humidity = (float) (Math.random());

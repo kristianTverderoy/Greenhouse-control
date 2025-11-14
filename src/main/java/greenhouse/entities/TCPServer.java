@@ -79,8 +79,8 @@ public class TCPServer {
 
         boolean clientConnected = true;
         while (isOn && clientConnected && !clientSocket.isClosed()) {
-          String message = reader.readLine();
-          if (message.equalsIgnoreCase("exit")) {
+          String message = reader.readLine(); // message is null if client abruptly disconnects
+          if (message == null || message.equalsIgnoreCase("exit")) {
             clientConnected = false;
             removeSubscriber(clientSocket);
           } else {
@@ -88,8 +88,9 @@ public class TCPServer {
           }
         }
       } catch (IOException e) {
-        e.printStackTrace();
-
+        // Client disconnected abruptly (e.g., connection reset)
+        removeSubscriber(clientSocket);
+        System.out.println("Client disconnected: " + clientSocket.getInetAddress().getHostAddress());
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -205,9 +206,6 @@ public class TCPServer {
         case "lightsensor" -> targetGreenhouse.addSensor(new LightSensor<>(
                 targetGreenhouse.getNextAvailableSensorId()));
 
-        case "motionsensor" -> targetGreenhouse.addSensor(new MotionSensor<>(
-                targetGreenhouse.getNextAvailableSensorId()));
-
         case "phsensor" -> targetGreenhouse.addSensor(new PHSensor<>(
                 targetGreenhouse.getNextAvailableSensorId()));
 
@@ -279,14 +277,14 @@ public class TCPServer {
   /**
    * Updates the server state to "on", allowing it to start accepting connections in the run loop.
    */
-  public void startServer() {
+  public synchronized void startServer() {
     this.isOn = true;
   }
 
   /**
    * Updates the server state to "off", stopping it from accepting further connections in the run loop.
    */
-  public void stopServer() {
+  public synchronized void stopServer() {
     this.isOn = false;
     subscribedClients.forEach(clientConnection -> {
       try {
@@ -302,7 +300,7 @@ public class TCPServer {
   /**
    * Closes the server socket to stop accepting new connections.
    */
-  private void closeServer() {
+  private synchronized void closeServer() {
     try {
       if (serverSocket != null && !serverSocket.isClosed()) {
         serverSocket.close();
