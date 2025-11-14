@@ -18,8 +18,8 @@ public class Humidifier extends Actuator {
    * @param id the unique identifier for this humidifier
    * @param humidityRate the rate at which humidity is increased (percentage per time unit)
    */
-  public Humidifier(String type, int id, float humidityRate) {
-    super(type, id);
+  public Humidifier(int id, float humidityRate) {
+    super("Humidifier", id);
     setHumidityRate(humidityRate);
   }
 

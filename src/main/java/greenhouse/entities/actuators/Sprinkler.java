@@ -13,8 +13,8 @@ public class Sprinkler extends Actuator {
    * @param type the type identifier for this actuator
    * @param id the unique identifier for this sprinkler
    */
-  public Sprinkler(String type, int id) {
-    super(type, id);
+  public Sprinkler(int id) {
+    super("Sprinkler", id);
   }
 
 }

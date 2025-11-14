@@ -4,8 +4,8 @@ public class Limer extends Actuator {
 
   //TODO: Finish class (Frida)
   // Changes PH value
-  public Limer(String type, int id) {
-    super(type, id);
+  public Limer(int id) {
+    super("Limer", id);
   }
   
 }

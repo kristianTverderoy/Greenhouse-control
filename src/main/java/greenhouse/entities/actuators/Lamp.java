@@ -11,8 +11,8 @@ public class Lamp extends Actuator {
    * @param type the type identifier for this actuator
    * @param id the unique identifier for this lamp.
    */
-  public Lamp(String type, int id) {
-    super(type, id);
+  public Lamp(int id) {
+    super("Lamp", id);
   }
   
 }

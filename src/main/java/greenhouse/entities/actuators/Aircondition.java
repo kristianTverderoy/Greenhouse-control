@@ -12,8 +12,8 @@ public class Aircondition extends Actuator {
   /**
    * Actuator responsible for lowering or raising temperature.
   */
-  public Aircondition(String type, int id) {
-    super(type, id);
+  public Aircondition(int id) {
+    super("Aircondition", id);
   }
 
   /**
