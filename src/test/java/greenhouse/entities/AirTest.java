@@ -2,7 +2,6 @@ package greenhouse.entities;
 
 //import org.junit.jupiter.api.Assertions;
 
-import greenhouse.entities.sensors.TemperatureSensor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
