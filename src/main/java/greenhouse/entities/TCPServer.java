@@ -146,20 +146,65 @@ public class TCPServer {
       }
 
     }
+
+    if (message.startsWith("man")){
+      return handleManualRequest(message);
+    }
+
+    if (message.startsWith("sensorreading")){
+      handleSensorReadingRequest(message);
+      return "\n";
+    }
+
     return switch (message) {
       case "status" -> "Server is running";
       case "getallgreenhouses" -> getListOfAllGreenHouses();
       case "ison" -> Boolean.toString(isOn);
       case "info" -> "Server information";
       case "help" -> "Available commands: Status, GetAllGreenHouses, IsOn, Info, Help, AvailableSensors";
-      case "availablesensors" -> "'HumiditySensor', 'LightSensor', 'MotionSensor', 'PHSensor', 'TemperatureSensor'"
+      case "availablesensors" -> "'HumiditySensor', 'LightSensor', 'PHSensor', 'TemperatureSensor'"
               +"Example: 'AddSensors -0 HumiditySensor ' this adds a humidity sensor to greenhouse nr.0."
               + " \n \n Example for multiple sensors: 'AddSensors -2 -LightSensor HumiditySensor MotionSensor'."
-      + " This adds multiple sensors at the same time, to Greenhouse nr.2.";
+              + " This adds multiple sensors at the same time, to Greenhouse nr.2.";
       case "newgreenhouse" -> createNewGreenhouse();
       default -> "Unknown command";
     };
   }
+
+  private String handleManualRequest(String messageFromClient){
+    String[] parts = messageFromClient.split("-");
+    parts[1] = parts[1].trim().toLowerCase();
+
+    return switch (parts[1]) {
+        case "sensorreading" -> "To specify a sensor to receive information from. Use the command:"
+        + " SensorReading -'select greenhouse id to read from'.\n"
+        + "To read all sensors from a greenhouse, type SensorReading -'greenhouseID' -a";
+
+        //TODO: import manual cases from switchcase above, into this switchcase.
+
+        default -> "Did not find that item in 'man'.";
+    };
+  }
+
+
+  //TODO: Vurder om denna ikkje skal sende til alle subscribers.
+  private void handleSensorReadingRequest(String messageFromClient){
+    String[] parts = messageFromClient.split("-");
+    GreenHouse greenHouse = greenHouses.get(Integer.parseInt(parts[1].trim())); //This represents the greenhouse with the ID specified by the client.
+    parts[2] = parts[2].trim().toLowerCase(); //This represents the sensor(s)
+
+    if (parts[2].equals("a")) {
+      notifySubscribers(greenHouse.getAllSensorsInformation());
+    } else {Sensor<?> sensor = greenHouse.getSensor(Integer.parseInt(parts[2]));
+      if (sensor != null) {
+        notifySubscribers(sensor.toString());
+      } else {
+        notifySubscribers("Sensor not found with ID: " + parts[2]);
+      }
+    }
+
+  }
+
 
   /**
    * Creates a new greenhouse and adds it to the threadsafe array list.
@@ -189,7 +234,7 @@ public class TCPServer {
     try {
     String[] parts = message.split("-");
     int greenhouseId = Integer.parseInt(parts[1].trim());
-    String[] sensors = parts[1].split(" ");
+    String[] sensors = parts[2].split(" ");
 
 
       GreenHouse targetGreenhouse = greenHouses.stream()
