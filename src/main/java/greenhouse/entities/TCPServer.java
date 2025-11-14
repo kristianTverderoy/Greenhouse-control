@@ -196,9 +196,6 @@ public class TCPServer {
         case "lightsensor" -> this.greenHouses.getFirst().addSensor(new LightSensor<>(
                 this.greenHouses.getFirst().getNextAvailableSensorId()));
 
-        case "motionsensor" -> this.greenHouses.getFirst().addSensor(new MotionSensor<>(
-                this.greenHouses.getFirst().getNextAvailableSensorId()));
-
         case "phsensor" -> this.greenHouses.getFirst().addSensor(new PHSensor<>(
                 this.greenHouses.getFirst().getNextAvailableSensorId()));
 
