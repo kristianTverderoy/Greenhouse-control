@@ -4,13 +4,7 @@ public interface SensorContract<T> {
     // Identity and metadata
     int getId();
     String getType();
-    String getLocation();
 
-    // Core functionality
-    T getCurrentReading();
-    T getLowEndRangeValue();
-    T getMaxEndRangeValue();
-    T getAverageReading();
 
     // Status and lifecycle
     boolean isActive();
@@ -20,6 +14,5 @@ public interface SensorContract<T> {
     void reset();
 
     // Configuration
-    void setThreshold(T min, T max);
     boolean isInAlertState();
 }

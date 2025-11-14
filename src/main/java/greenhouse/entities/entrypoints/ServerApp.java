@@ -2,9 +2,6 @@ package greenhouse.entities.entrypoints;
 
 import greenhouse.entities.TCPServer;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-
 /**
  * The program's entrypoint where the purpose is to start a TCPServer and allow communication
  * with clients connecting to the server.
