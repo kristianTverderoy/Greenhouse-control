@@ -7,7 +7,7 @@ package greenhouse.entities.sensors;
  *
  * @param <T> the type of data this sensor reads (e.g., Double, Integer)
  */
-public abstract class Sensor<T> implements SensorContract<T>{
+public abstract class Sensor<T> {
   private int id;
   private String type;
   private String location;
