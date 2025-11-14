@@ -18,4 +18,15 @@ public class PHSensor<T> extends Sensor<T> {
   public void stop() {
 
   }
+
+  @Override
+  public String toString() {
+    return "PHSensor{" +
+            "id=" + getId() +
+            ", latestPhReading=" + latestPhReading +
+            ", isActive=" + isActive() +
+            ", isConnected=" + isConnected() +
+            ", isAlertState=" + isInAlertState() +
+            '}';
+  }
 }

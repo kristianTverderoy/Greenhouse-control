@@ -9,7 +9,7 @@ package greenhouse.entities.sensors;
  */
 public abstract class Sensor<T> {
   private int id;
-  private String type;
+  private final String type;
   private T currentReading;
   private T averageReading;
   private boolean isActive;
@@ -155,4 +155,7 @@ public abstract class Sensor<T> {
   public boolean isInAlertState() {
     return this.isAlertState;
   }
+
+  @Override
+  public abstract String toString();
 }

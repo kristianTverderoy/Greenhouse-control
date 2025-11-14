@@ -16,4 +16,14 @@ public class TemperatureSensor<T> extends Sensor<T>{
   public void stop() {
     
   }
+
+  @Override
+  public String toString() {
+    return "TemperatureSensor{" +
+            "id=" + getId() +
+            ", isActive=" + isActive() +
+            ", isConnected=" + isConnected() +
+            ", isAlertState=" + isInAlertState() +
+            '}';
+  }
 }

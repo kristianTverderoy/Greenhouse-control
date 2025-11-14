@@ -16,4 +16,14 @@ public class HumiditySensor<T> extends Sensor<T> {
   public void stop() {
 
   }
+
+  @Override
+  public String toString() {
+    return "HumiditySensor{" +
+            "id=" + getId() +
+            ", isActive=" + isActive() +
+            ", isConnected=" + isConnected() +
+            ", isAlertState=" + isInAlertState() +
+            '}';
+  }
 }

@@ -15,5 +15,13 @@ public class LightSensor<T> extends Sensor<T> {
 
   }
 
-
+  @Override
+  public String toString() {
+    return "LightSensor{" +
+            "id=" + getId() +
+            ", isActive=" + isActive() +
+            ", isConnected=" + isConnected() +
+            ", isAlertState=" + isInAlertState() +
+            '}';
+  }
 }
