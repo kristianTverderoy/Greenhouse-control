@@ -23,16 +23,17 @@ public abstract class Sensor<T> {
    * @param type the type of sensor (e.g., "temperature", "humidity", "soil moisture")
    * @param id the unique identifier for this sensor
    */
-  public Sensor(String type, int id){
+  public Sensor(String type, int id) {
     this.id = id;
     this.type = type;
   }
 
   /**
-   * Sets the sensor's id to an int value
+   * Sets the sensor's id to an int value.
+   *
    * @param newId The new unique identifier to assign to this sensor.
    */
-  public void setId(int newId){
+  public void setId(int newId) {
     this.id = newId;
   }
 
@@ -42,7 +43,7 @@ public abstract class Sensor<T> {
    *
    * @param newState true if the sensor is in alert state, false otherwise
    */
-  public void setAlertState(boolean newState){
+  public void setAlertState(boolean newState) {
     this.isAlertState = newState;
   }
 
@@ -51,21 +52,21 @@ public abstract class Sensor<T> {
    *
    * @param newConnectionStatus true if connected, false if disconnected
    */
-  public void setConnectionStatus(boolean newConnectionStatus){
+  public void setConnectionStatus(boolean newConnectionStatus) {
     this.isConnected = newConnectionStatus;
   }
 
   /**
    * Activates this sensor, enabling it to take readings.
    */
-  public void setActive(){
+  public void setActive() {
     this.isActive = true;
   }
 
   /**
    * Deactivates this sensor, disabling it from taking readings.
    */
-  public void setInactive(){
+  public void setInactive() {
     this.isActive = false;
   }
 
@@ -96,9 +97,9 @@ public abstract class Sensor<T> {
    * @throws SensorNotYetActiveException if the sensor has no current reading available
    */
   public T getCurrentReading() {
-    if (this.currentReading == null){
-      throw new SensorNotYetActiveException("Current reading can not be read if the sensor does not have a " +
-              "reading to give");
+    if (this.currentReading == null) {
+      throw new SensorNotYetActiveException("Current reading can not be read if the sensor  "
+              + "does not have a reading to give");
     }
     return currentReading;
   }
@@ -111,9 +112,9 @@ public abstract class Sensor<T> {
    * @throws SensorNotYetActiveException if the sensor has no readings to calculate an average
    */
   public T getAverageReading() {
-    if (this.averageReading == null){
-      throw new SensorNotYetActiveException("Average reading can not be read if the sensor does not have a" +
-              " reading to give");
+    if (this.averageReading == null) {
+      throw new SensorNotYetActiveException("Average reading can not be read if the sensor "
+              + " does not have a reading to give");
     }
     return this.averageReading;
   }
