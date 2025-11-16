@@ -1,10 +1,15 @@
 package greenhouse.entities.sensors;
 
-public class TemperatureSensor<T> extends Sensor<T>{
+import greenhouse.entities.Air;
+import greenhouse.entities.AirSubscriber;
 
+public class TemperatureSensor<T> extends Sensor<T> implements AirSubscriber {
 
-  public TemperatureSensor(int id) {
+  private double latestTemperatureReading;
+
+  public TemperatureSensor(int id,Air air) {
     super("TemperatureSensor", id);
+    update(air);
   }
 
   @Override
@@ -15,6 +20,16 @@ public class TemperatureSensor<T> extends Sensor<T>{
   @Override
   public void stop() {
     
+  }
+
+  @Override
+  public void subscribe(Air air) {
+    air.addSubscriber(this);
+  }
+
+  @Override
+  public void update(Air air) {
+    this.latestTemperatureReading = air.getTemperature();
   }
 
   @Override

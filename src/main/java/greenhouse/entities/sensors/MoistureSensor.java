@@ -3,12 +3,13 @@ package greenhouse.entities.sensors;
 import greenhouse.entities.Soil;
 import greenhouse.entities.SoilSubscriber;
 
-public class PHSensor<T> extends Sensor<T> implements SoilSubscriber {
+public class MoistureSensor<T> extends Sensor<T> implements SoilSubscriber {
 
-  private double latestPhReading;
+  private double latestMoistureReading;
 
-  public PHSensor(int id, Soil soil) {
-    super("PHSensor", id);
+  
+  public MoistureSensor(int id, Soil soil) {
+    super("MoistureSensor", id);
     update(soil);
   }
 
@@ -29,14 +30,14 @@ public class PHSensor<T> extends Sensor<T> implements SoilSubscriber {
 
   @Override
   public void update(Soil soil) {
-    this.latestPhReading = soil.getPhValue();
+    this.latestMoistureReading = soil.getSoilMoisture();
   }
 
   @Override
   public String toString() {
-    return "PHSensor{" +
+    return "MoistureSensor{" +
             "id=" + getId() +
-            ", latestPhReading=" + latestPhReading +
+            ", latestMoistureReading=" + latestMoistureReading +
             ", isActive=" + isActive() +
             ", isConnected=" + isConnected() +
             ", isAlertState=" + isInAlertState() +
