@@ -170,22 +170,35 @@ public class TCPServer {
     };
   }
 
+  /**
+   * Handles the use of man command in menu.
+   * Splits messageFromClient to separate 'man' and the command
+   * Select command if exists.
+   */
   private String handleManualRequest(String messageFromClient){
-    String[] parts = messageFromClient.split("-");
-    parts[1] = parts[1].trim().toLowerCase();
+    try {
+      String[] parts = messageFromClient.split("-");
+      parts[1] = parts[1].trim().toLowerCase();
 
-    return switch (parts[1]) {
-        case "sensorreading" -> "To specify a sensor to receive information from. Use the command:"
-        + " SensorReading -'select greenhouse id to read from'.\n"
-        + "To read all sensors from a greenhouse, type SensorReading -'greenhouseID' -a";
+      return switch (parts[1]) {
+          case "sensorreading" -> "To specify a sensor to receive information from. Use the command:"
+          + " SensorReading -'select greenhouse id to read from'.\n"
+          + "To read all sensors from a greenhouse, type SensorReading -'greenhouseID' -a";
 
-        //TODO: import manual cases from switchcase above, into this switchcase.
+          //TODO: import manual cases from switchcase above, into this switchcase.
 
-        default -> "Did not find that item in 'man'.";
-    };
+          default -> "Did not find that item in 'man'.";
+      };
+    } catch (ArrayIndexOutOfBoundsException e) {
+      return """
+             Error: Please include '-' before command.
+             Example use: man -sensorreading
+             """;
+    }
   }
 
 
+  //TODO: guard condition if no greenhouses
   private String handleSensorReadingRequest(String messageFromClient){
     String[] parts = messageFromClient.split("-");
     GreenHouse greenHouse = greenHouses.get(Integer.parseInt(parts[1].trim())); //This represents the greenhouse with the ID specified by the client.
