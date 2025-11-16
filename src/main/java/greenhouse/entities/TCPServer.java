@@ -200,7 +200,20 @@ public class TCPServer {
     }
   }
 
-
+  /**
+   * Handles a sensor reading request from the client and returns sensor data.
+   *
+   * <p>This method parses the command string to extract the greenhouse ID and sensor specification,
+   * then retrieves the requested sensor information.</p>
+   *
+   * @param messageFromClient the command string in the format: "sensorReading -<greenhouseId> -<sensorId|'a'>"
+   *                            <p>Examples:</p>
+   *                            <ul>
+   *                              <li>"sensorReading -0 -2" - reads data from sensor with ID 2 in greenhouse 0</li>
+   *                              <li>"sensorReading -1 -a" - reads data from all sensors in greenhouse 1</li>
+   *                            </ul>
+   * @return a string containing the sensor reading(s), or "Sensor not found with ID: <id>" if the sensor doesn't exist.
+   */
   //TODO: guard condition if no greenhouses
   private String handleSensorReadingRequest(String messageFromClient){
     String[] parts = messageFromClient.split("-");
@@ -239,6 +252,16 @@ public class TCPServer {
 
   }
 
+  /**
+   * Adds specified sensors to a selected greenhouse.
+   * @param message the command string in the format: "addSensor -<greenhouseId> <sensor1> <sensor2>..."
+   *                Example: "addSensor -0 HumiditySensor TemperatureSensor"
+   *                This adds a HumiditySensor and TemperatureSensor to greenhouse with ID 0.
+   * @throws SensorNotAddedToGreenHouseException if the sensor type is invalid
+   * @throws NoExistingGreenHouseException if there are no existing greenhouses in the list or the greenhouse
+   * ID does not exist.
+   * @throws IOException if the message format is incorrect or cannot be parsed.
+   */
   private void addSensorsToGreenhouse(String message) throws SensorNotAddedToGreenHouseException, NoExistingGreenHouseException, IOException {
     if (greenHouses.isEmpty()){
       throw new NoExistingGreenHouseException();
