@@ -43,4 +43,11 @@ public abstract class Actuator {
   public boolean getPowerState() {
     return this.isOn;
   }
+
+  @Override
+  public String toString() {
+    String status = isOn ? "on" : "off";
+    return String.format("Actuator [Type: %s, ID: %d, Status: %s]", type, id, status);
+  }
+
 }
