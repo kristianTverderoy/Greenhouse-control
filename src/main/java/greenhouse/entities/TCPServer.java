@@ -76,6 +76,9 @@ public class TCPServer {
     try (clientSocket; BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
          BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()))) {
       try {
+        writer.write("Welcome to the Greenhouse Server! Type 'help' for available commands.");
+        writer.newLine();
+        writer.flush();
 
         boolean clientConnected = true;
         while (isOn && clientConnected && !clientSocket.isClosed()) {
