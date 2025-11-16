@@ -4,11 +4,10 @@ package greenhouse.entities;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.MalformedInputException;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import greenhouse.entities.actuators.Actuator;
 import greenhouse.entities.sensors.*;
 
 public class TCPServer {
@@ -158,6 +157,10 @@ public class TCPServer {
       return handleSensorReadingRequest(message);
     }
 
+    if (message.startsWith("actuatorreading")){
+      return handleActuatorReadingRequest(message);
+    }
+
     return switch (message) {
       case "status" -> "Server is running";
       case "getallgreenhouses" -> getListOfAllGreenHouses();
@@ -229,6 +232,28 @@ public class TCPServer {
         return "Sensor not found with ID: " + parts[2];
       }
     }
+
+  }
+
+  /**
+   * Receive actuator status data from any sensor node.
+   */
+  private String handleActuatorReadingRequest(String message) {
+    String[] parts = message.split("-");
+    GreenHouse greenHouse = greenHouses.get(Integer.parseInt(parts[1].trim()));
+    parts[2] = parts[2].trim().toLowerCase();
+
+    if (parts[2].equals("a")) {
+      return greenHouse.getAllActuatorsInformation();
+    } else {
+      Actuator actuator = greenHouse.getActuator(Integer.parseInt(parts[2]));
+      if (actuator != null) {
+        return actuator.toString();
+      } else {
+        return "Actuator not found with ID: " + parts[2];
+      }
+    }
+
 
   }
 
