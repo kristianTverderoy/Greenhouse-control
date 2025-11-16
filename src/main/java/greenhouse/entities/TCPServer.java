@@ -152,8 +152,7 @@ public class TCPServer {
     }
 
     if (message.startsWith("sensorreading")){
-      handleSensorReadingRequest(message);
-      return "\n";
+      return handleSensorReadingRequest(message);
     }
 
     return switch (message) {
@@ -187,19 +186,18 @@ public class TCPServer {
   }
 
 
-  //TODO: Vurder om denna ikkje skal sende til alle subscribers.
-  private void handleSensorReadingRequest(String messageFromClient){
+  private String handleSensorReadingRequest(String messageFromClient){
     String[] parts = messageFromClient.split("-");
     GreenHouse greenHouse = greenHouses.get(Integer.parseInt(parts[1].trim())); //This represents the greenhouse with the ID specified by the client.
     parts[2] = parts[2].trim().toLowerCase(); //This represents the sensor(s)
 
     if (parts[2].equals("a")) {
-      notifySubscribers(greenHouse.getAllSensorsInformation());
+      return greenHouse.getAllSensorsInformation();
     } else {Sensor<?> sensor = greenHouse.getSensor(Integer.parseInt(parts[2]));
       if (sensor != null) {
-        notifySubscribers(sensor.toString());
+        return sensor.toString();
       } else {
-        notifySubscribers("Sensor not found with ID: " + parts[2]);
+        return "Sensor not found with ID: " + parts[2];
       }
     }
 
