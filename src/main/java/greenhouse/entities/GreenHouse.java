@@ -1,5 +1,6 @@
 package greenhouse.entities;
 
+import greenhouse.entities.actuators.Actuator;
 import greenhouse.entities.sensors.Sensor;
 
 import java.util.List;
@@ -45,4 +46,12 @@ public class GreenHouse {
     sensors.forEach((id, sensor) -> sb.append(sensor.toString()).append("\n"));
     return sb.toString();
   }
+
+  //TODO: Implement getActuator and getAllActuatorsInformation
+//  public Actuator getActuator(int i) {
+//    return actuator.
+//  }
+//
+//  public String getAllActuatorsInformation() {
+//  }
 }
