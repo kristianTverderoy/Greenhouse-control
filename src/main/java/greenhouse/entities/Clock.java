@@ -126,7 +126,7 @@ public class Clock {
    * @return A runnable that tells every ClockSubscriber that the clock
    *  has ticked.
    */
-  private Runnable tick() {
+  public Runnable tick() {
     return () -> subscribers.forEach(ClockSubscriber::tick);
   }
 

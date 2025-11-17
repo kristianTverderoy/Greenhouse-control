@@ -10,7 +10,7 @@ public class AirTest {
 
   @Test
   public void updateStateShouldChangeHumidityLuxAndTemperatureEachUpdate() {
-    Air airInGreenHouse = new Air(20, 0.5f);
+    Air airInGreenHouse = new Air(20, 0.5f, 10000);
     int humidityChanges = 0;
     int lightChanges = 0;
     int tempChanges = 0;
@@ -34,7 +34,7 @@ public class AirTest {
 
   @Test
   public void stateValuesShouldConvergeTowardsTargetValues() {
-    Air air = new Air(40, 0.9f);
+    Air air = new Air(40, 0.9f, 10000);
     int convergedResultsTemp = 0;
     int convergedResultsHumidity = 0;
     for (int i = 0; i < 100; i++) {

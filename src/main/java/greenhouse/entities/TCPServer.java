@@ -286,18 +286,18 @@ public class TCPServer {
 
       for (String sensor : sensors) {
 
-        switch (sensor) {
-          case "humiditysensor" -> targetGreenhouse.addSensor(new HumiditySensor<>(
-                  targetGreenhouse.getNextAvailableSensorId()));
+      switch(sensor){
+        case "humiditysensor" -> targetGreenhouse.addHumiditySensor();
 
-          case "lightsensor" -> targetGreenhouse.addSensor(new LightSensor<>(
-                  targetGreenhouse.getNextAvailableSensorId()));
+        case "lightsensor" -> targetGreenhouse.addLightSensor();
 
-          case "phsensor" -> targetGreenhouse.addSensor(new PHSensor<>(
-                  targetGreenhouse.getNextAvailableSensorId()));
+        case "phsensor" -> targetGreenhouse.addPhSensor();
 
-          case "temperaturesensor" -> targetGreenhouse.addSensor(new TemperatureSensor<>(
-                  targetGreenhouse.getNextAvailableSensorId()));
+        case "temperaturesensor" -> targetGreenhouse.addTemperatureSensor();
+
+        case "moisturesensor" -> targetGreenhouse.addMoistureSensor();
+
+        case "nitrogensensor" -> targetGreenhouse.addNitrogenSensor();
 
           default -> throw new SensorNotAddedToGreenHouseException();
         }

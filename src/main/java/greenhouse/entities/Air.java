@@ -1,5 +1,7 @@
 package greenhouse.entities;
 
+import java.util.ArrayList;
+
 public class Air extends ClockSubscriber implements Sensorable {
 
   private float humidity; // 0 <= x <= 1
@@ -14,7 +16,8 @@ public class Air extends ClockSubscriber implements Sensorable {
   private boolean initialLightSet = false;
   private boolean initialHumiditySet = false;
   private int currentHour = 0;
-
+  private ArrayList<AirSubscriber> subscribers;
+  
   /**
    * Creates an instance of the Air, with target temperature,
    * humidity and light level.
@@ -27,44 +30,7 @@ public class Air extends ClockSubscriber implements Sensorable {
     this.temperatureTarget = tempTarget;
     this.humidityTarget = humidityTarget;
     this.luxTarget = luxTarget;
-    subscribe();
-  }
-
-  /**
-   * Creates an instance of the Air, with target temperature
-   * and humidity.
-   *
-   * @param tempTarget     The target temperature of the air.
-   * @param humidityTarget The target humidity of the air.
-   */
-  public Air(double tempTarget, float humidityTarget) {
-    this.humidityTarget = humidityTarget;
-    this.temperatureTarget = tempTarget;
-    this.luxTarget = null;
-    subscribe();
-  }
-
-  /**
-   * Creates an instance of the Air, with target temperature.
-   *
-   * @param tempTarget The target temperature of the air.
-   */
-  public Air(double tempTarget) {
-    this.temperatureTarget = tempTarget;
-    this.humidityTarget = 0.5f; // default humidity target
-    this.luxTarget = null;
-    subscribe();
-  }
-
-  /**
-   * Creates an instance of the Air, with target humidity.
-   *
-   * @param humidityTarget The target humidity of the air.
-   */
-  public Air(float humidityTarget) {
-    this.humidityTarget = humidityTarget;
-    this.temperatureTarget = defaultTemperature; // default temperature target
-    this.luxTarget = null;
+    subscribers = new ArrayList<>();
     subscribe();
   }
 
@@ -146,7 +112,6 @@ public class Air extends ClockSubscriber implements Sensorable {
     } else {
       humidity -= humidityChange;
     }
-
   }
 
   /**
@@ -219,4 +184,22 @@ public class Air extends ClockSubscriber implements Sensorable {
   public Double getLuxTarget() {
     return luxTarget;
   }
+
+  /**
+   * Adds a subscriber to the list of subscribers of this air.
+   * 
+   * @param subscriber The subscriber being added to the list of
+   *                   subscribers.
+   */
+  public void addSubscriber(AirSubscriber subscriber) {
+    this.subscribers.add(subscriber);
+  }
+
+  /**
+   * Alerts the airSubscribers that the air has changed.
+   */
+  public void update() {
+    subscribers.forEach(subscriber -> subscriber.update(this));
+  }
+
 }

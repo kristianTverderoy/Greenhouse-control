@@ -1,22 +1,26 @@
 package greenhouse.entities.sensors;
 
-public class PHSensor<T> extends Sensor<T> {
+import greenhouse.entities.Soil;
+import greenhouse.entities.SoilSubscriber;
+
+public class PHSensor<T> extends Sensor<T> implements SoilSubscriber {
 
     private double latestPhReading;
 //    private PHAppliance appliance;
 
-    public PHSensor(int id) {
-        super("PHSensor", id);
-    }
-
-  @Override
-  public void start() {
-
+  public PHSensor(int id, Soil soil) {
+    super("PHSensor", id);
+    update(soil);
   }
 
   @Override
-  public void stop() {
+  public void subscribe(Soil soil) {
+    soil.addSubscriber(this);
+  }
 
+  @Override
+  public void update(Soil soil) {
+    this.latestPhReading = soil.getPhValue();
   }
 
   @Override
@@ -24,9 +28,10 @@ public class PHSensor<T> extends Sensor<T> {
     return "PHSensor{" +
             "id=" + getId() +
             ", latestPhReading=" + latestPhReading +
-            ", isActive=" + isActive() +
-            ", isConnected=" + isConnected() +
-            ", isAlertState=" + isInAlertState() +
             '}';
+  }
+
+  public double getPh() {
+    return latestPhReading;
   }
 }

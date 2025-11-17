@@ -2,8 +2,9 @@ package greenhouse.entities;
 
 import greenhouse.entities.appliances.Appliance;
 import greenhouse.entities.sensors.Sensor;
+import greenhouse.entities.sensors.*;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,15 +14,50 @@ public class GreenHouse {
   private final Map<Integer, Appliance> appliances;
   private List<Sensorable> sensorableObjects;
   private final int greenHouseID;
+  private Soil soil;
+  private Air air;
+
 
   public GreenHouse(int greenHouseID) {
     this.sensors = new ConcurrentHashMap<>();
     this.appliances = new ConcurrentHashMap<>();
     this.greenHouseID = greenHouseID;
+    initiateAirAndSoil();
   }
 
   public void addSensor(Sensor<?> sensor) {
     this.sensors.put(sensor.getId(), sensor);
+
+    if (sensor instanceof AirSubscriber airSubscriber) {
+      airSubscriber.subscribe(this.air);
+    }
+    if (sensor instanceof SoilSubscriber soilSubscriber) {
+      soilSubscriber.subscribe(this.soil);
+    }
+  }
+
+  public void addHumiditySensor() {
+    addSensor(new HumiditySensor<>(getNextAvailableSensorId(), air));
+  }
+
+  public void addLightSensor() {
+    addSensor(new LightSensor<>(getNextAvailableSensorId(), air));
+  }
+
+  public void addPhSensor() {
+    addSensor(new PHSensor<>(getNextAvailableSensorId(), soil));
+  }
+
+  public void addMoistureSensor() {
+    addSensor(new MoistureSensor<>(getNextAvailableSensorId(), soil));
+  }
+
+  public void addTemperatureSensor() {
+    addSensor(new TemperatureSensor<>(getNextAvailableSensorId(), air));
+  }
+
+  public void addNitrogenSensor() {
+    addSensor(new NitrogenSensor<>(getNextAvailableSensorId(), soil));
   }
 
   public void addAppliance(Appliance appliance) {
@@ -36,6 +72,13 @@ public class GreenHouse {
     return this.sensors.get(id);
   }
 
+  /**
+   * Initiates Air and Soil with default values.
+   */
+  private void initiateAirAndSoil() {
+    this.soil = new Soil(50, 7, 20);
+    this.air = new Air(20, 60, 10000);
+  }
   /**
    * Due to zero-based indexing, the next available id is at the last id + 1.
    * Since sensors. Size doesn't care about zero based indexing, the next available id is just
