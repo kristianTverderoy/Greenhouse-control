@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 /**
  * <p>
- *   Represents a soil sample with a ph value and
- *   moisture level.
+ *   Represents a soil sample with a ph value,
+ *   moisture level and nitrogen level.
  * </p>
  * <ul>
  *   <li>
@@ -172,9 +172,9 @@ public class Soil extends ClockSubscriber implements Sensorable {
    */
   @Override
   public void updateState() {
+    phTick();
     dry();
     useFertilizer();
-    phTick();
     update();
   }
 

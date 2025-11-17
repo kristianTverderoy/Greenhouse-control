@@ -35,7 +35,7 @@ public class TCPClient {
         try {
           String serverMessage;
           while ((serverMessage = bufferedReader.readLine()) != null) {
-            System.out.println("Server: " + serverMessage);
+            System.out.println(serverMessage);
           }
         } catch (IOException e) {
           System.err.println("Connection to server lost: " + e.getMessage());

@@ -1,21 +1,36 @@
 package greenhouse.entities.sensors;
 
-public class PHSensor<T> extends Sensor<T> {
+import greenhouse.entities.Soil;
+import greenhouse.entities.SoilSubscriber;
 
-    private double latestPhReading;
-//    private PHActuator actuator;
+public class PHSensor<T> extends Sensor<T> implements SoilSubscriber {
 
-    public PHSensor(int id) {
-        super("PHSensor", id);
-    }
+  private double latestPhReading;
 
-  @Override
-  public void start() {
-
+  public PHSensor(int id, Soil soil) {
+    super("PHSensor", id);
+    update(soil);
   }
 
   @Override
-  public void stop() {
+  public void subscribe(Soil soil) {
+    soil.addSubscriber(this);
+  }
 
+  @Override
+  public void update(Soil soil) {
+    this.latestPhReading = soil.getPhValue();
+  }
+
+  @Override
+  public String toString() {
+    return "PHSensor{" +
+            "id=" + getId() +
+            ", latestPhReading=" + latestPhReading +
+            '}';
+  }
+
+  public double getPh() {
+    return latestPhReading;
   }
 }
