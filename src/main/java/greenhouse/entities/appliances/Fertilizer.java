@@ -1,6 +1,6 @@
-package greenhouse.entities.actuators;
+package greenhouse.entities.appliances;
 
-public class Fertilizer extends Actuator {
+public class Fertilizer extends Appliance {
 
   //TODO: finish class (Frida) also requires a nitrogen level sensor
   // Raises nitrogen level

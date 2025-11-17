@@ -1,5 +1,7 @@
 package greenhouse.entities;
 
+import greenhouse.entities.appliances.Appliance;
+import greenhouse.entities.sensors.Sensor;
 import greenhouse.entities.sensors.*;
 
 import java.util.ArrayList;
@@ -9,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GreenHouse {
 
   private final Map<Integer, Sensor<?>> sensors;
+  private final Map<Integer, Appliance> appliances;
+  private List<Sensorable> sensorableObjects;
   private final int greenHouseID;
   private Soil soil;
   private Air air;
@@ -16,6 +20,7 @@ public class GreenHouse {
 
   public GreenHouse(int greenHouseID) {
     this.sensors = new ConcurrentHashMap<>();
+    this.appliances = new ConcurrentHashMap<>();
     this.greenHouseID = greenHouseID;
     initiateAirAndSoil();
   }
@@ -55,6 +60,10 @@ public class GreenHouse {
     addSensor(new NitrogenSensor<>(getNextAvailableSensorId(), soil));
   }
 
+  public void addAppliance(Appliance appliance) {
+    this.appliances.put(appliance.getId(), appliance);
+  }
+
   public int getID(){
     return this.greenHouseID;
   }
@@ -71,14 +80,25 @@ public class GreenHouse {
     this.air = new Air(20, 60, 10000);
   }
   /**
-   * Due to zero based indexing the next available id is at the last id + 1.
-   * Since sensors.size doesnt care about zero based indexing, the next available id is just
+   * Due to zero-based indexing, the next available id is at the last id + 1.
+   * Since sensors. Size doesn't care about zero based indexing, the next available id is just
    * the number we get from taking the length of the list.
-   * 
+   *
    * @return The next available id number for a sensor.
    */
   public int getNextAvailableSensorId(){
     return sensors.size();
+  }
+
+  /**
+   * Due to zero-based indexing, the next available id is at the last id + 1.
+   * Since appliances.size() doesn't care about zero based indexing, the next available id is just
+   * the number we get from taking the length of the map.
+   *
+   * @return The next available id number for an appliance.
+   */
+  public int getNextAvailableApplianceId(){
+    return appliances.size();
   }
 
   public String getAllSensorsInformation() {
@@ -87,11 +107,13 @@ public class GreenHouse {
     return sb.toString();
   }
 
-  //TODO: Implement getActuator and getAllActuatorsInformation
-//  public Actuator getActuator(int i) {
-//    return actuator.
-//  }
-//
-//  public String getAllActuatorsInformation() {
-//  }
+  public Appliance getAppliance(int id) {
+    return this.appliances.get(id);
+  }
+
+  public String getAllAppliancesInformation() {
+    StringBuilder sb = new StringBuilder();
+    appliances.forEach((id, appliance) -> sb.append(appliance.toString()).append("\n"));
+    return sb.toString();
+  }
 }

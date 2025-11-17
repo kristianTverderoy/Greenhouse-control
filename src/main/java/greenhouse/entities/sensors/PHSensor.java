@@ -5,7 +5,8 @@ import greenhouse.entities.SoilSubscriber;
 
 public class PHSensor<T> extends Sensor<T> implements SoilSubscriber {
 
-  private double latestPhReading;
+    private double latestPhReading;
+//    private PHAppliance appliance;
 
   public PHSensor(int id, Soil soil) {
     super("PHSensor", id);

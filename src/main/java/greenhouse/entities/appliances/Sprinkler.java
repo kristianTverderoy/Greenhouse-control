@@ -1,16 +1,16 @@
-package greenhouse.entities.actuators;
+package greenhouse.entities.appliances;
 
 /**
- * Actuator responsible for watering plants in the greenhouse.
+ * Appliance responsible for watering plants in the greenhouse.
  * The sprinkler controls water distribution to maintain optimal moisture levels
  * for plant growth.
  */
-public class Sprinkler extends Actuator {
+public class Sprinkler extends Appliance {
 
   /**
    * Constructs a new Sprinkler with the specified parameters.
    *
-   * @param type the type identifier for this actuator
+   * @param type the type identifier for this appliance
    * @param id the unique identifier for this sprinkler
    */
   public Sprinkler(int id) {
