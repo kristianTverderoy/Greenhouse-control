@@ -149,10 +149,11 @@ public class TCPServer {
 
     //:TODO: Create better cases.
 
-
+/*
     if (message.startsWith("actuatorreading")){
       return handleActuatorReadingRequest(message);
     }
+*/
 
     return switch (message) {
       case "status" -> "Server is running";
@@ -215,7 +216,7 @@ public class TCPServer {
 
   /**
    * Receive actuator status data from any sensor node.
-   */
+   */ /*
   private String handleActuatorReadingRequest(String message) {
     String[] parts = message.split("-");
     GreenHouse greenHouse = greenHouses.get(Integer.parseInt(parts[1].trim()));
@@ -233,7 +234,7 @@ public class TCPServer {
     }
 
 
-  }
+  }*/
 
 
   /**
