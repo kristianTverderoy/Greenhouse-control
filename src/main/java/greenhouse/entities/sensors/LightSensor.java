@@ -36,9 +36,11 @@ public class LightSensor<T> extends Sensor<T> implements AirSubscriber {
   public String toString() {
     return "LightSensor{" +
             "id=" + getId() +
-            ", isActive=" + isActive() +
-            ", isConnected=" + isConnected() +
-            ", isAlertState=" + isInAlertState() +
+            ", lux=" + latestLuxReading +
             '}';
+  }
+
+  public double getLux() {
+    return latestLuxReading;
   }
 }

@@ -37,9 +37,10 @@ public class PHSensor<T> extends Sensor<T> implements SoilSubscriber {
     return "PHSensor{" +
             "id=" + getId() +
             ", latestPhReading=" + latestPhReading +
-            ", isActive=" + isActive() +
-            ", isConnected=" + isConnected() +
-            ", isAlertState=" + isInAlertState() +
             '}';
+  }
+
+  public double getPh() {
+    return latestPhReading;
   }
 }

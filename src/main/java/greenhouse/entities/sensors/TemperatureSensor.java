@@ -36,9 +36,11 @@ public class TemperatureSensor<T> extends Sensor<T> implements AirSubscriber {
   public String toString() {
     return "TemperatureSensor{" +
             "id=" + getId() +
-            ", isActive=" + isActive() +
-            ", isConnected=" + isConnected() +
-            ", isAlertState=" + isInAlertState() +
+            ", temperature=" + latestTemperatureReading +
             '}';
+  }
+
+  public double getTemperature() {
+    return latestTemperatureReading;
   }
 }

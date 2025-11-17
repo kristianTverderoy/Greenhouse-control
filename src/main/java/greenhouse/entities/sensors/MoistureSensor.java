@@ -38,9 +38,10 @@ public class MoistureSensor<T> extends Sensor<T> implements SoilSubscriber {
     return "MoistureSensor{" +
             "id=" + getId() +
             ", latestMoistureReading=" + latestMoistureReading +
-            ", isActive=" + isActive() +
-            ", isConnected=" + isConnected() +
-            ", isAlertState=" + isInAlertState() +
             '}';
+  }
+
+  public double getMoisture() {
+    return latestMoistureReading;
   }
 }

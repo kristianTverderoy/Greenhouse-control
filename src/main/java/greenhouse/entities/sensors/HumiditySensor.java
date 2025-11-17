@@ -37,10 +37,11 @@ public class HumiditySensor<T> extends Sensor<T> implements AirSubscriber {
     return "HumiditySensor{" +
             "id=" + getId() +
             ", humidityLevel=" + this.latestHumidityReading +
-            ", isActive=" + isActive() +
-            ", isConnected=" + isConnected() +
-            ", isAlertState=" + isInAlertState() +
             '}';
+  }
+
+  public double getHumidity() {
+    return latestHumidityReading;
   }
 
 

@@ -172,9 +172,9 @@ public class Soil extends ClockSubscriber implements Sensorable {
    */
   @Override
   public void updateState() {
+    phTick();
     dry();
     useFertilizer();
-    phTick();
     update();
   }
 

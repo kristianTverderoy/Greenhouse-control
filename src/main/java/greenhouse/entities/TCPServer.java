@@ -269,6 +269,8 @@ public class TCPServer {
 
         case "moisturesensor" -> targetGreenhouse.addMoistureSensor();
 
+        case "nitrogensensor" -> targetGreenhouse.addNitrogenSensor();
+
           default -> throw new SensorNotAddedToGreenHouseException();
       }
 

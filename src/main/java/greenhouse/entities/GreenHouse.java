@@ -2,17 +2,17 @@ package greenhouse.entities;
 
 import greenhouse.entities.sensors.*;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GreenHouse {
 
   private final Map<Integer, Sensor<?>> sensors;
-  private List<Sensorable> sensorableObjects;
   private final int greenHouseID;
   private Soil soil;
   private Air air;
+
 
   public GreenHouse(int greenHouseID) {
     this.sensors = new ConcurrentHashMap<>();
@@ -51,6 +51,10 @@ public class GreenHouse {
     addSensor(new TemperatureSensor<>(getNextAvailableSensorId(), air));
   }
 
+  public void addNitrogenSensor() {
+    addSensor(new NitrogenSensor<>(getNextAvailableSensorId(), soil));
+  }
+
   public int getID(){
     return this.greenHouseID;
   }
@@ -82,4 +86,6 @@ public class GreenHouse {
     sensors.forEach((id, sensor) -> sb.append(sensor.toString()).append("\n"));
     return sb.toString();
   }
+
+
 }

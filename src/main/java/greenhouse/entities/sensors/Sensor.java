@@ -1,5 +1,7 @@
 package greenhouse.entities.sensors;
 
+import java.util.ArrayList;
+
 /**
  * Abstract base class for all sensor types in the greenhouse system.
  * This class provides common functionality for managing sensor state, readings,
