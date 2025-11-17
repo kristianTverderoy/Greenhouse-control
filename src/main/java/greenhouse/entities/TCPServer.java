@@ -4,11 +4,16 @@ package greenhouse.entities;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import greenhouse.entities.actuators.Actuator;
 import greenhouse.entities.sensors.*;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 public class TCPServer {
 
@@ -18,6 +23,8 @@ public class TCPServer {
   private volatile boolean isOn = false;
   private ServerSocket serverSocket;
   private final MenuSystem menuSystem;
+  private static final String ENCRYPTION_ALGORITHM = "AES";
+  private static final SecretKey SECRET_KEY = new SecretKeySpec(Base64.getDecoder().decode("m0VxcSPFs+2cuMUfh6tjWMj90eihSDGpc1cLr/B9e1Y="), ENCRYPTION_ALGORITHM);
 
 
   /**
@@ -78,19 +85,24 @@ public class TCPServer {
 
     try (clientSocket; BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
          BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()))) {
-      writer.write("Welcome to the Greenhouse Server!");
+
+      writer.write(encryptMessage("Welcome to the Greenhouse Server!"));
       writer.newLine();
 
 
         while (isOn && !clientSocket.isClosed()) {
           menuSystem.showStartMenu(writer);
-          String message = reader.readLine(); // message is null if client abruptly disconnects
 
-          if (message == null || message.equalsIgnoreCase("exit")) {
+
+          String encryptedMessage = reader.readLine(); // message is null if client abruptly disconnects
+          String decryptedMessage = decryptMessage(encryptedMessage);
+          System.out.println(decryptedMessage);
+
+          if (decryptedMessage == null || decryptedMessage.equalsIgnoreCase("exit")) {
             removeSubscriber(clientSocket);
-          } else {
-            handleClientRequest(clientSocket, message, reader, writer);
+            break;
           }
+          handleClientRequest(clientSocket, decryptedMessage, reader, writer);
         }
       } catch (IOException e) {
       // Client disconnected abruptly (e.g., connection reset)
@@ -115,7 +127,7 @@ public class TCPServer {
       case "subscribe" -> handleSubscribe(clientSocket, writer);
       case "help" -> menuSystem.helpMessage(writer);
       default -> {
-        writer.write("Did not recognize command. Type 'help' for available commands.");
+        writer.write(encryptMessage("Did not recognize command. Type 'help' for available commands."));
         writer.newLine();
         writer.flush();
       }
@@ -327,9 +339,9 @@ public class TCPServer {
 
     if (!alreadySubscribed) {
       addSubscriber(clientSocket, writer);
-      writer.write("Subscribed successfully.");
+      writer.write(encryptMessage("Subscribed successfully."));
     } else {
-      writer.write("Already subscribed.");
+      writer.write(encryptMessage("Already subscribed."));
     }
     writer.newLine();
     writer.flush();
@@ -355,6 +367,57 @@ public class TCPServer {
             clientConnection -> clientConnection.socket().equals(subscriber));
   }
 
+  public void sendMessageToClient(Socket clientSocket, BufferedWriter writer, String message) throws IOException {
+    String messageToSend = encryptMessage(message);
+    writer.write(encryptMessage(messageToSend));
+    writer.newLine();
+    writer.flush();
+  }
+
+  /**
+   * Encrypts a message using AES encryption.
+   * The encrypted message is encoded in Base64 for safe transmission.
+   *
+   * @param message the message to encrypt
+   * @return the encrypted message encoded in Base64, or original message if encryption fails.
+   */
+  public String encryptMessage(String message) {
+    if (message == null || message.isEmpty()) {
+      return message;
+    }
+    try {
+      Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
+      cipher.init(Cipher.ENCRYPT_MODE, SECRET_KEY);
+      byte[] encryptedBytes = cipher.doFinal(message.getBytes());
+      return Base64.getEncoder().encodeToString(encryptedBytes);
+    } catch (Exception e) {
+      System.err.println("Encryption failed: " + e.getMessage());
+      return message; // Return original message if encryption fails
+    }
+  }
+
+  /**
+   * Decrypts a Base64-encoded AES encrypted message.
+   *
+   * @param encryptedMessage the encrypted message in Base64 format
+   * @return the decrypted plaintext message, or original message if decryption fails
+   */
+  public String decryptMessage(String encryptedMessage) {
+    if (encryptedMessage == null || encryptedMessage.isEmpty()) {
+      return encryptedMessage;
+    }
+    try {
+      byte[] decodedBytes = Base64.getDecoder().decode(encryptedMessage);
+      Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
+      cipher.init(Cipher.DECRYPT_MODE, SECRET_KEY);
+      byte[] decryptedBytes = cipher.doFinal(decodedBytes);
+      return new String(decryptedBytes);
+    } catch (Exception e) {
+      System.err.println("Decryption failed: " + e.getMessage());
+      return encryptedMessage; // Return original message if decryption fails
+    }
+  }
+
   /**
    * Notifies all registered subscribers with the provided update message.
    * The message is sent to each subscriber's writer, and
@@ -366,7 +429,7 @@ public class TCPServer {
   public void notifySubscribers(String updateMessage) {
     subscribedClients.removeIf(clientConnection -> {
       try {
-        clientConnection.writer.write(updateMessage);
+        clientConnection.writer.write(encryptMessage(updateMessage));
         clientConnection.writer.newLine();
         clientConnection.writer.flush();
         return false; // Notification sent successfully, i.e do not remove subscriber.
