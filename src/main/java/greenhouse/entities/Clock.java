@@ -139,6 +139,7 @@ public class Clock {
   public static synchronized Clock getInstance() {
     if (clock == null) {
       clock = new Clock();
+      clock.start();
     }
     return clock;
   }

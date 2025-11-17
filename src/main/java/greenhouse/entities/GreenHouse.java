@@ -22,7 +22,7 @@ public class GreenHouse {
 
   public void addSensor(Sensor<?> sensor) {
     this.sensors.put(sensor.getId(), sensor);
-    
+
     if (sensor instanceof AirSubscriber airSubscriber) {
       airSubscriber.subscribe(this.air);
     }
@@ -87,5 +87,11 @@ public class GreenHouse {
     return sb.toString();
   }
 
-
+  //TODO: Implement getActuator and getAllActuatorsInformation
+//  public Actuator getActuator(int i) {
+//    return actuator.
+//  }
+//
+//  public String getAllActuatorsInformation() {
+//  }
 }
