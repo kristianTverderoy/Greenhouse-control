@@ -18,7 +18,8 @@ public class CommandProcessor {
 
       return switch (parts[1]) {
         case "sensorreading" -> "To specify a sensor to receive information from. Use the command:"
-                + " SensorReading -'select sensor id to read from'.\n"
+                + "SensorReading -<id>\n"
+                + "Where <id> is select sensor id to read from.\n"
                 + "To read all sensors from the selected greenhouse, type SensorReading -a\n"
                 + "Example: 'sensorreading -2' will read the sensor with id 2 in the greenhouse you're in the menu of."
                 + "Likewise, 'sensorreading -a' will read all sensors in the greenhouse you're in the menu of.";
