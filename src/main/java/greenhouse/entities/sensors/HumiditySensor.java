@@ -13,16 +13,6 @@ public class HumiditySensor<T> extends Sensor<T> implements AirSubscriber {
   }
 
   @Override
-  public void start() {
-
-  }
-
-  @Override
-  public void stop() {
-
-  }
-
-  @Override
   public void subscribe(Air air) {
     air.addSubscriber(this);
   }

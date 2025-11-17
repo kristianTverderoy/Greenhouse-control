@@ -13,16 +13,6 @@ public class PHSensor<T> extends Sensor<T> implements SoilSubscriber {
   }
 
   @Override
-  public void start() {
-
-  }
-
-  @Override
-  public void stop() {
-
-  }
-
-  @Override
   public void subscribe(Soil soil) {
     soil.addSubscriber(this);
   }
