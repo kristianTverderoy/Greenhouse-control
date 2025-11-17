@@ -22,6 +22,10 @@ public class NitrogenSensor<T> extends Sensor<T> implements SoilSubscriber {
     latestNitrogenReading = soil.getNitrogen();
   }
 
+  public double getNitrogen() {
+    return latestNitrogenReading;
+  }
+
   @Override
   public String toString() {
     return "NitrogenSensor{" +
