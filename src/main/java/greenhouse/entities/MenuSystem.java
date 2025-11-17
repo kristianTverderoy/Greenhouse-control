@@ -51,7 +51,7 @@ public class MenuSystem {
   public void showStartMenu(BufferedWriter writer) throws IOException {
     writer.write("\nMenu:");
     writer.newLine();
-    writer.write("Commands: greenhouses | help | subscribe | exit");
+    writer.write("Commands: greenhouses | newgreenhouse | help | exit");
     writer.newLine();
     writer.flush();
   }
