@@ -1,6 +1,6 @@
 package greenhouse.entities;
 
-import greenhouse.entities.sensors.Sensor;
+import greenhouse.entities.sensors.*;
 
 import java.util.List;
 import java.util.Map;
@@ -29,6 +29,26 @@ public class GreenHouse {
     if (sensor instanceof SoilSubscriber soilSubscriber) {
       soilSubscriber.subscribe(this.soil);
     }
+  }
+
+  public void addHumiditySensor() {
+    addSensor(new HumiditySensor<>(getNextAvailableSensorId(), air));
+  }
+
+  public void addLightSensor() {
+    addSensor(new LightSensor<>(getNextAvailableSensorId(), air));
+  }
+
+  public void addPhSensor() {
+    addSensor(new PHSensor<>(getNextAvailableSensorId(), soil));
+  }
+
+  public void addMoistureSensor() {
+    addSensor(new MoistureSensor<>(getNextAvailableSensorId(), soil));
+  }
+
+  public void addTemperatureSensor() {
+    addSensor(new TemperatureSensor<>(getNextAvailableSensorId(), air));
   }
 
   public int getID(){
