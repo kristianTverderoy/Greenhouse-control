@@ -3,6 +3,11 @@ package greenhouse.entities.sensors;
 import greenhouse.entities.Air;
 import greenhouse.entities.AirSubscriber;
 
+/**
+ * Represents
+ *
+ * @param <T>
+ */
 public class LightSensor<T> extends Sensor<T> implements AirSubscriber {
 
   private double latestLuxReading;
