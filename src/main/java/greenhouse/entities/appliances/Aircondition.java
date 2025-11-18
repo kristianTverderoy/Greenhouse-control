@@ -5,7 +5,6 @@ package greenhouse.entities.appliances;
  * Can operate in cooling or heating mode to maintain optimal temperature.
  */
 public class Aircondition extends AirAppliance {
-
   private boolean cooling = false;
   private boolean heating = false;
 
