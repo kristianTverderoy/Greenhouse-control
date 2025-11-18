@@ -45,6 +45,13 @@ public class CommandProcessor {
                 + "Where <number> is the id of the appliance you want to toggle (e.g 1), \n "
                 + "Example: 'toggleappliance -3' will toggle on/off the appliance with the id 3";
 
+        case "appliancereading" -> "To get the status of an appliance, use the command: "
+                + "appliancereading -<number>.\n"
+                + "Where <number> is the id of the appliance you want to get the status from (e.g 1), \n "
+                + "To read all appliances in the selected greenhouse, type appliancereading -a\n"
+                + "Example: 'appliancereading -3' will return the status of the appliance with the id 3 \n"
+                + "Likewise, 'appliancereading -a' will read all appliances in the greenhouse you're in the menu of.";
+
 
         default -> "Did not find that item in 'man'.";
       };
