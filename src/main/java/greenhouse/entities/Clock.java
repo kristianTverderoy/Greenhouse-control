@@ -23,7 +23,6 @@ public class Clock {
 
   private ScheduledExecutorService scheduler;
   private boolean on;
-
   private static Clock clock = null;
   private ArrayList<ClockSubscriber> subscribers;
 
@@ -152,5 +151,25 @@ public class Clock {
    */
   public void subscribe(ClockSubscriber subscriber) {
     subscribers.add(subscriber);
+  }
+
+  /**
+   * Removes the subscriber with the given subscriber id.
+   *
+   * @param id The id of the subscriber is the clock's
+   *           list of subscribers.
+   */
+  public void removeSubscriber(int id) {
+    subscribers.remove(id);
+  }
+
+  /**
+   * Returns the id of the last subscriber in the clock's list
+   * of subscribers.
+   *
+   * @return The id of the last subscriber in the clock's list of subscribers.
+   */
+  public int getLastSubscriber() {
+    return subscribers.size() - 1;
   }
 }

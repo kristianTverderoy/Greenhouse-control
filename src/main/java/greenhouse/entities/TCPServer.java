@@ -15,7 +15,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-public class TCPServer {
+public class TCPServer extends ClockSubscriber {
 
   private final int port;
   private final List<ClientConnection> subscribedClients = new CopyOnWriteArrayList<>();
@@ -25,6 +25,7 @@ public class TCPServer {
   private final MenuSystem menuSystem;
   private static final String ENCRYPTION_ALGORITHM = "AES";
   private static final SecretKey SECRET_KEY = new SecretKeySpec(Base64.getDecoder().decode("m0VxcSPFs+2cuMUfh6tjWMj90eihSDGpc1cLr/B9e1Y="), ENCRYPTION_ALGORITHM);
+  private int greenHouseToListenTo = -1;
 
 
   /**
@@ -527,6 +528,38 @@ public class TCPServer {
     return isOn;
   }
 
+  /**
+   * Sends all sensor information of the greenhouse the client is listening to,
+   * to the client.
+   */
+  @Override
+  public void tick() {
+    if (greenHouseToListenTo == -1) {
+      notifySubscribers("Error: You are not listening to a greenhouse.");
+    } else {
+      notifySubscribers(greenHouses.get(greenHouseToListenTo).getAllSensorsInformation());
+    }
+  }
+
+  /**
+   * Subscribes the server to the clock and sets the id of the
+   * greenhouse the client is listening to, to the given id.
+   *
+   * @param id The id of the greenhouse the client is listening to.
+   */
+  public void startListeningToGreenhouse(int id) {
+    subscribe();
+    greenHouseToListenTo = id;
+  }
+
+  /**
+   * Unsubscribes the server from the clock and sets the id of the
+   * greenhouse the client is listening to, to -1.
+   */
+  public void stopListeningToGreenHouse() {
+    Clock.getInstance().removeSubscriber(Clock.getInstance().getLastSubscriber());
+    greenHouseToListenTo = -1;
+  }
 
   /**
    * Record holding information about a client connection.
@@ -552,7 +585,11 @@ public class TCPServer {
     public BufferedWriter writer() {
       return writer;
     }
+
+
   }
+
+
 
 
 }
