@@ -192,7 +192,7 @@ public class MenuSystem {
         }
       } else if (input.startsWith("sensorreading")) {
         try {
-          writer.write(server.handleSensorReadingRequest(input + " -" + id));
+          writer.write(server.encryptMessage(server.handleSensorReadingRequest(input + " -" + id)));
           writer.newLine();
           writer.flush();
         } catch (IOException e) {
@@ -305,15 +305,12 @@ public class MenuSystem {
     server.subscribeClientToGreenhouseUpdates(gh, writer);
 
     try {
-
       while (server.isOn()) {
         String input = server.decryptMessage(reader.readLine());
         if (input == null) {
-          server.stopListeningToGreenHouse();
           break;
         }
         if (input.toLowerCase().trim().equals("stop") || input.toLowerCase().trim().equals("back")) {
-          server.stopListeningToGreenHouse();
           writer.write(server.encryptMessage("Sensor monitoring stopped."));
           writer.newLine();
           writer.flush();
