@@ -163,8 +163,8 @@ public class MenuSystem {
       if (!hasShownMenu) {
         writer.write(server.encryptMessage("\nGreenhouse " + id));
         writer.newLine();
-        writer.write(server.encryptMessage("Commands: 'help' | 'back' | 'addsensor' | 'sensorreading' | "
-                + "'addappliance' | 'appliance' "));
+        writer.write(server.encryptMessage("Commands: 'help' | 'addsensor' | 'sensorreading' | "
+                + "'addappliance' | 'appliance' | 'back'"));
         writer.newLine();
         writer.flush();
         hasShownMenu = true;
@@ -192,15 +192,15 @@ public class MenuSystem {
           writer.write(server.handleSensorReadingRequest(input + " -" + id));
           writer.newLine();
           writer.flush();
-        } catch (IOException e){
+        } catch (IOException e) {
           writer.write(server.encryptMessage("Could not process sensor reading request. Try 'man -sensorreading' for help."));
           writer.newLine();
           writer.flush();
-        } catch (NoExistingGreenHouseException e){
+        } catch (NoExistingGreenHouseException e) {
           writer.write(server.encryptMessage("Could not find greenhouse to read sensor from."));
           writer.newLine();
           writer.flush();
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
           writer.write(server.encryptMessage("Invalid sensor ID provided for reading. Try 'man -sensorreading' for help."));
           writer.newLine();
           writer.flush();
@@ -208,28 +208,75 @@ public class MenuSystem {
       } else if (input.startsWith("addappliance")) {
         try {
           server.addAppliancesToGreenhouse(input + " -" + id);
+          writer.write(server.encryptMessage("Appliance(s) added successfully."));
+          writer.newLine();
+          writer.flush();
         } catch (ApplianceNotAddedToGreenHouseException | IOException e) {
-          writer.write("Could not add appliance. Try 'man -addappliance' for help.");
+          writer.write(server.encryptMessage("Could not add appliance. Try 'man -addappliance' for help."));
           writer.newLine();
           writer.flush();
         } catch (NoExistingGreenHouseException e) {
-          writer.write("Could not find greenhouse to add appliance to.");
+          writer.write(server.encryptMessage("Could not find greenhouse to add appliance to."));
           writer.newLine();
           writer.flush();
         }
-
-      } else if (input.startsWith("man")){
-          String manualResponse = CommandProcessor.handleManualRequest(input);
-          writer.write(server.encryptMessage(manualResponse));
+      } else if (input.startsWith("appliancereading")) {
+        try {
+          writer.write(server.encryptMessage(server.handleApplianceReadingRequest(input + " -" + id)));
+          writer.newLine();
+          writer.flush();
+        } catch (IOException e) {
+          writer.write(server.encryptMessage("Could not process appliance reading request. Try 'man -appliancereading' for help."));
+          writer.newLine();
+          writer.flush();
+        } catch (NoExistingGreenHouseException e) {
+          writer.write(server.encryptMessage("Could not find greenhouse to read appliance from."));
+          writer.newLine();
+          writer.flush();
+        } catch (IllegalArgumentException e) {
+          writer.write(server.encryptMessage("Invalid appliance ID provided for reading. Try 'man -appliancereading' for help."));
           writer.newLine();
           writer.flush();
         }
+      } else if (input.startsWith("toggleappliance")) {
+        try {
+          server.toggleAppliance(input + " -" + id);
+          writer.write(server.encryptMessage("Appliance toggled successfully."));
+          writer.newLine();
+          writer.flush();
+        } catch (IOException e) {
+          writer.write(server.encryptMessage("Could not process appliance toggle request."));
+          writer.newLine();
+          writer.flush();
+        } catch (NoExistingGreenHouseException e) {
+          writer.write(server.encryptMessage("Could not find greenhouse to toggle appliance in."));
+          writer.newLine();
+          writer.flush();
+        } catch (IllegalArgumentException e) {
+          writer.write(server.encryptMessage("Invalid appliance ID provided for toggling. Try 'man -toggleappliance' for help."));
+          writer.newLine();
+          writer.flush();
+        }
+      } else if (input.startsWith("man")) {
+        String manualResponse = CommandProcessor.handleManualRequest(input);
+        writer.write(server.encryptMessage(manualResponse));
+        writer.newLine();
+        writer.flush();
+      }
 
       switch (input) {
         case "help" -> {
           writer.write(server.encryptMessage("Commands:"));
           writer.newLine();
-          writer.write(server.encryptMessage("'sensors' - List all sensors in this greenhouse."));
+          writer.write(server.encryptMessage("'addsensor' For further info, use 'man -addsensor'."));
+          writer.newLine();
+          writer.write(server.encryptMessage("'sensorreading' For further info, use 'man -sensorreading'."));
+          writer.newLine();
+          writer.write(server.encryptMessage("'addappliance' For further info, use 'man -addappliance'."));
+          writer.newLine();
+          writer.write(server.encryptMessage("'toggleappliance' For further info, use 'man -toggleappliance'."));
+          writer.newLine();
+          writer.write(server.encryptMessage("'help' - Show help message."));
           writer.newLine();
           writer.write(server.encryptMessage("'back' - Return to the previous menu."));
           writer.newLine();
@@ -237,14 +284,6 @@ public class MenuSystem {
         }
         case "back" -> {
           return;
-        }
-        case "sensors" -> {
-          writer.write(server.encryptMessage(gh.getAllSensorsInformation()));
-          writer.newLine();
-          writer.flush();
-        }
-        case "addsensor" -> {
-
         }
       }
     }
