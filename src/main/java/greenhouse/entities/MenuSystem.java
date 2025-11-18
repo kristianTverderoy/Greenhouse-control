@@ -164,7 +164,7 @@ public class MenuSystem {
         writer.write(server.encryptMessage("\nGreenhouse " + id));
         writer.newLine();
         writer.write(server.encryptMessage("Commands: 'help' | 'addsensor' | 'sensorreading' | "
-                + "'addappliance' | 'appliance' | 'monitor' | 'newtemptarget' | 'newnumiditytarget' | 'back'"));
+                + "'addappliance' | 'appliance' | 'monitor' | 'newtemptarget' | 'newhumiditytarget' | 'back'"));
         writer.newLine();
         writer.flush();
         hasShownMenu = true;
@@ -335,7 +335,7 @@ public class MenuSystem {
           writer.write(server.encryptMessage("Invalid humidity target provided. Try man -newhumiditytarget' for help."));
           writer.newLine();
           writer.flush();
-        }      } else if (input.startsWith("man")) {
+        }      }else if (input.startsWith("man")) {
         String manualResponse = CommandProcessor.handleManualRequest(input);
         writer.write(server.encryptMessage(manualResponse));
         writer.newLine();
