@@ -15,6 +15,8 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import greenhouse.entities.filehandling.JsonWriter;
+
 public class TCPServer {
 
   private final int port;
@@ -125,6 +127,14 @@ public class TCPServer {
     switch (command) {
       case "greenhouses" -> menuSystem.handleGreenhousesMenu(reader, writer);
       case "subscribe" -> handleSubscribe(clientSocket, writer);
+      case "saveserverstate" -> {
+        try {
+          saveAllGreenHouses();
+          writer.write(encryptMessage("Successfully saved server state."));
+        } catch (IOException e) {
+          writer.write(encryptMessage("Failed to save server state. Please try again."));
+        }
+      }
       case "help" -> menuSystem.helpMessage(writer);
       default -> {
         writer.write(encryptMessage("Did not recognize command. Type 'help' for available commands."));
@@ -513,6 +523,7 @@ public class TCPServer {
   private synchronized void closeServer() {
     try {
       if (serverSocket != null && !serverSocket.isClosed()) {
+        saveAllGreenHouses();
         serverSocket.close();
       }
     } catch (IOException e) {
@@ -527,6 +538,13 @@ public class TCPServer {
    */
   public boolean isOn() {
     return isOn;
+  }
+
+  private void saveAllGreenHouses() throws IOException {
+    JsonWriter writer = new JsonWriter();
+    for (GreenHouse greenHouse : this.greenHouses) {
+      writer.saveGreenhouse(greenHouse);
+    }
   }
 
 
