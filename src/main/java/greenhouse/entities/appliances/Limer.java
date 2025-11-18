@@ -11,7 +11,7 @@ public class Limer extends SoilAppliance {
   }
 
   @Override
-  void actuate() {
+  public void actuate() {
     super.getSoil().lime();
   }
 }
