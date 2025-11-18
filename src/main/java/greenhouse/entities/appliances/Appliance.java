@@ -7,7 +7,6 @@ package greenhouse.entities.appliances;
 public abstract class Appliance {
   private String type;
   private int id;
-  protected boolean isOn = false;
 
   /**
    * Constructs a new Appliance with the specified parameters.
@@ -29,28 +28,18 @@ public abstract class Appliance {
     this.id = id;
   }
 
-  /**
-   * Changes isOn to false if it was true and vice versa.
-   */
-  public void togglePower() {
-    this.isOn = !this.isOn;
-  }
-
-  /**
-   * Returns the true or false if the appliance is on.
-   * @return the value of isOn
-   */
-  public boolean getPowerState() {
-    return this.isOn;
+  public String getType() {
+    return type;
   }
 
   @Override
   public String toString() {
-    String status = isOn ? "on" : "off";
-    return String.format("Appliance [Type: %s, ID: %d, Status: %s]", type, id, status);
+    return String.format("Appliance [Type: %s, ID: %d]", type, id);
   }
 
   public Integer getId() {
     return this.id;
   }
+
+  public abstract void actuate();
 }

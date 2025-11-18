@@ -1,11 +1,14 @@
 package greenhouse.entities.appliances;
 
-public class Fertilizer extends Appliance {
+public class Fertilizer extends SoilAppliance {
 
-  //TODO: finish class (Frida) also requires a nitrogen level sensor
-  // Raises nitrogen level
+
   public Fertilizer(int id) {
     super("Fertilizer", id);
   }
-  
+
+  @Override
+  public void actuate() {
+    super.getSoil().useFertilizer();
+  }
 }

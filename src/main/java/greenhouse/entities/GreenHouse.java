@@ -1,10 +1,11 @@
 package greenhouse.entities;
 
 import greenhouse.entities.appliances.Appliance;
+import greenhouse.entities.appliances.SoilAppliance;
 import greenhouse.entities.sensors.Sensor;
 import greenhouse.entities.sensors.*;
 
-import java.util.ArrayList;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,7 +13,6 @@ public class GreenHouse {
 
   private final Map<Integer, Sensor<?>> sensors;
   private final Map<Integer, Appliance> appliances;
-  private List<Sensorable> sensorableObjects;
   private final int greenHouseID;
   private Soil soil;
   private Air air;
@@ -61,6 +61,9 @@ public class GreenHouse {
   }
 
   public void addAppliance(Appliance appliance) {
+    if (appliance instanceof SoilAppliance) {
+      ((SoilAppliance) appliance).addSoil(this.soil);
+    }
     this.appliances.put(appliance.getId(), appliance);
   }
 
@@ -115,5 +118,9 @@ public class GreenHouse {
     StringBuilder sb = new StringBuilder();
     appliances.forEach((id, appliance) -> sb.append(appliance.toString()).append("\n"));
     return sb.toString();
+  }
+
+  public void actuateAppliance(int id) {
+    this.appliances.get(id).actuate();
   }
 }

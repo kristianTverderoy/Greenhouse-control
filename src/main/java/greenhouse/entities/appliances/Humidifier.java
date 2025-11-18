@@ -8,7 +8,7 @@ package greenhouse.entities.appliances;
  * <p>This appliance extends {@link Appliance} with Float type parameter,
  * representing humidity percentage values.
  */
-public class Humidifier extends Appliance {
+public class Humidifier extends AirAppliance {
 
 
   /**

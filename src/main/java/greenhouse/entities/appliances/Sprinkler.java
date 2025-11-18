@@ -5,16 +5,19 @@ package greenhouse.entities.appliances;
  * The sprinkler controls water distribution to maintain optimal moisture levels
  * for plant growth.
  */
-public class Sprinkler extends Appliance {
+public class Sprinkler extends SoilAppliance {
 
   /**
    * Constructs a new Sprinkler with the specified parameters.
    *
-   * @param type the type identifier for this appliance
    * @param id the unique identifier for this sprinkler
    */
   public Sprinkler(int id) {
     super("Sprinkler", id);
   }
 
+  @Override
+  void actuate() {
+    super.getSoil().waterSoil(20);
+  }
 }
