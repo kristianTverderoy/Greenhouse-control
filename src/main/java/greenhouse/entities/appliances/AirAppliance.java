@@ -22,6 +22,7 @@ public abstract class AirAppliance extends Appliance{
 
   /**
    * Returns the true or false if the appliance is on.
+   *
    * @return the value of isOn
    */
   public boolean getPowerState() {
@@ -34,6 +35,9 @@ public abstract class AirAppliance extends Appliance{
     return String.format("Appliance [Type: %s, ID: %d, Status: %s]", super.getType(), super.getId(), status);
   }
 
+  /**
+   * Turns the appliance on or off.
+   */
   @Override
   public void actuate() {
     togglePower();

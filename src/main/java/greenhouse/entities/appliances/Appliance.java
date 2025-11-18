@@ -28,6 +28,11 @@ public abstract class Appliance {
     this.id = id;
   }
 
+  /**
+   * Returns the type of the actuator.
+   *
+   * @return The type of the actuator.
+   */
   public String getType() {
     return type;
   }
@@ -37,9 +42,17 @@ public abstract class Appliance {
     return String.format("Appliance [Type: %s, ID: %d]", type, id);
   }
 
+  /**
+   * Returns the id of the appliance.
+   *
+   * @return The id of the appliance.
+   */
   public Integer getId() {
     return this.id;
   }
 
+  /**
+   * Activates the appliance.
+   */
   public abstract void actuate();
 }

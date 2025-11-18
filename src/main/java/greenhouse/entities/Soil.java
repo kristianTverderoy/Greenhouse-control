@@ -6,12 +6,6 @@ import java.util.ArrayList;
  * <p>
  *   Represents a soil sample with a ph value,
  *   moisture level and nitrogen level.
- * </p>
- * <ul>
- *   <li>
- *
- *   </li>
- * </ul>
  */
 public class Soil extends ClockSubscriber implements Sensorable {
   private double soilMoisture; //The percentage of moisture of the soil
