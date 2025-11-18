@@ -1,7 +1,11 @@
 package greenhouse.entities;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.Socket;
+import java.util.Base64;
 import java.util.Scanner;
 
 
@@ -12,11 +16,14 @@ import java.util.Scanner;
 public class TCPClient {
   private BufferedReader bufferedReader;
   private BufferedWriter bufferedWriter;
+  private static final String ENCRYPTION_ALGORITHM = "AES";
+  private static final SecretKey SECRET_KEY = new SecretKeySpec(Base64.getDecoder().decode("m0VxcSPFs+2cuMUfh6tjWMj90eihSDGpc1cLr/B9e1Y="), ENCRYPTION_ALGORITHM);
 
   /**
    * Constructs a TCPClient with the specified port, host, and server.
    */
   public TCPClient(){}
+
 
   //TODO: Remove sout statements when no longer necessary for debugging.
   public void connectToServer(String host, int port){
@@ -35,7 +42,7 @@ public class TCPClient {
         try {
           String serverMessage;
           while ((serverMessage = bufferedReader.readLine()) != null) {
-            System.out.println(serverMessage);
+            System.out.println(decryptMessage(serverMessage));
           }
         } catch (IOException e) {
           System.err.println("Connection to server lost: " + e.getMessage());
@@ -49,7 +56,9 @@ public class TCPClient {
       while (!disconnected) {
 
         String messageToSend = scanner.nextLine();
-        bufferedWriter.write(messageToSend);
+        String encryptedMessage = encryptMessage(messageToSend);
+
+        bufferedWriter.write(encryptedMessage);
         bufferedWriter.newLine();
         bufferedWriter.flush();
 
@@ -59,6 +68,52 @@ public class TCPClient {
       }
     } catch (Exception e){
       System.err.println("Could not connect to server: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Encrypts a message using AES encryption.
+   * The encrypted message is encoded in Base64 for safe transmission.
+   *
+   * @param message the plaintext message to encrypt
+   * @return the encrypted message encoded in Base64, or original message if encryption fails
+   */
+  private String encryptMessage(String message) {
+    if (message == null || message.isEmpty()) {
+      return message;
+    }
+
+    try {
+      Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
+      cipher.init(Cipher.ENCRYPT_MODE, SECRET_KEY);
+      byte[] encryptedBytes = cipher.doFinal(message.getBytes());
+      return Base64.getEncoder().encodeToString(encryptedBytes);
+    } catch (Exception e) {
+      System.err.println("Encryption failed: " + e.getMessage());
+      return message;
+    }
+  }
+
+  /**
+   * Decrypts a Base64-encoded AES encrypted message.
+   *
+   * @param encryptedMessage the encrypted message in Base64 format
+   * @return the decrypted plaintext message, or original message if decryption fails
+   */
+  private String decryptMessage(String encryptedMessage) {
+    if (encryptedMessage == null || encryptedMessage.isEmpty()) {
+      return encryptedMessage;
+    }
+
+    try {
+      Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
+      cipher.init(Cipher.DECRYPT_MODE, SECRET_KEY);
+      byte[] decodedBytes = Base64.getDecoder().decode(encryptedMessage);
+      byte[] decryptedBytes = cipher.doFinal(decodedBytes);
+      return new String(decryptedBytes);
+    } catch (Exception e) {
+      System.err.println("Decryption failed: " + e.getMessage());
+      return encryptedMessage;
     }
   }
 

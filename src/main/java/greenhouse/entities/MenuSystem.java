@@ -9,6 +9,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
 
+import greenhouse.entities.appliances.*;
+
 //TODO: Klasse skal i util pakke, eller ui pakke?
 
 /**
@@ -38,7 +40,7 @@ public class MenuSystem {
    * @throws IOException if an I/O error occurs while writing
    */
   public void helpMessage(BufferedWriter writer) throws IOException {
-    writer.write("Available commands: greenhouses, subscribe, help, exit");
+    writer.write(server.encryptMessage("Available commands: greenhouses, subscribe, help, exit"));
     writer.newLine();
     writer.flush();
   }
@@ -50,9 +52,9 @@ public class MenuSystem {
    * @throws IOException if an I/O error occurs while writing
    */
   public void showStartMenu(BufferedWriter writer) throws IOException {
-    writer.write("\nMenu:");
+    writer.write(server.encryptMessage("\nMenu:"));
     writer.newLine();
-    writer.write("Commands: greenhouses | newgreenhouse | help | exit");
+    writer.write(server.encryptMessage("Commands: greenhouses | newgreenhouse | help | exit"));
     writer.newLine();
     writer.flush();
   }
@@ -69,17 +71,18 @@ public class MenuSystem {
     boolean hasShownMenu = false;
     while (server.isOn()) {
       if (!hasShownMenu) {
-        writer.write("\nGreenhouses:");
+        writer.write(server.encryptMessage("\nGreenhouses:"));
         writer.newLine();
-        writer.write("Available greenhouses:\n" + getGreenhouseList());
+        writer.write(server.encryptMessage("Available greenhouses:\n" + getGreenhouseList()));
         writer.newLine();
-        writer.write("type 'help' for commands.");
+        writer.write(server.encryptMessage("type 'help' for commands."));
         writer.newLine();
         writer.flush();
         hasShownMenu = true;
       }
 
-      String input = reader.readLine();
+      String input = server.decryptMessage(reader.readLine());
+
       if (input != null) {
         input = input.toLowerCase().trim();
       } else {
@@ -93,26 +96,26 @@ public class MenuSystem {
         }
 
         case "help" -> {
-          writer.write("Type the greenhouse ID to view details. E.g., '0' for Greenhouse 0.");
+          writer.write(server.encryptMessage("Type the greenhouse ID to view details. E.g., '0' for Greenhouse 0."));
           writer.newLine();
-          writer.write("'newgreenhouse' - Create a new greenhouse.");
+          writer.write(server.encryptMessage("'newgreenhouse' - Create a new greenhouse."));
           writer.newLine();
-          writer.write("'back' - Return to the previous menu.");
+          writer.write(server.encryptMessage("'back' - Return to the previous menu."));
           writer.newLine();
-          writer.write("'listGreenhouses' - Show the list of greenhouses.");
+          writer.write(server.encryptMessage("'listGreenhouses' - Show the list of greenhouses."));
           writer.newLine();
           writer.flush();
         }
 
         case "newgreenhouse" -> {
           server.createNewGreenhouse();
-          writer.write("New greenhouse created.");
+          writer.write(server.encryptMessage("New greenhouse created."));
           writer.newLine();
           writer.flush();
         }
 
         case "listgreenhouses" -> {
-          writer.write(getGreenhouseList());
+          writer.write(server.encryptMessage(getGreenhouseList()));
           writer.newLine();
           writer.flush();
         }
@@ -123,7 +126,7 @@ public class MenuSystem {
             handleGreenhouseDetails(id, reader, writer);
             hasShownMenu = false;
           } catch (NumberFormatException e) {
-            writer.write("Invalid command. Try again. Type 'help' for commands.");
+            writer.write(server.encryptMessage("Invalid command. Try again. Type 'help' for commands."));
             writer.newLine();
             writer.flush();
           }
@@ -148,7 +151,7 @@ public class MenuSystem {
             .orElse(null);
 
     if (gh == null) {
-      writer.write("Greenhouse not found.");
+      writer.write(server.encryptMessage("Greenhouse not found."));
       writer.newLine();
       writer.flush();
       return;
@@ -158,17 +161,15 @@ public class MenuSystem {
 
     while (server.isOn()) {
       if (!hasShownMenu) {
-        writer.write("\nGreenhouse " + id);
+        writer.write(server.encryptMessage("\nGreenhouse " + id));
         writer.newLine();
-        writer.write("Sensors: " + gh.getAllSensorsInformation());
-        writer.newLine();
-        writer.write("Commands: 'help' | 'sensors' | 'back' | 'addsensor' | 'sensorreading' | "
-                + "'addappliance' | 'appliancereading");
+        writer.write(server.encryptMessage("Commands: 'help' | 'back' | 'addsensor' | 'sensorreading' | "
+                + "'addappliance' | 'appliance' "));
         writer.newLine();
         writer.flush();
         hasShownMenu = true;
       }
-      String input = reader.readLine();
+      String input = server.decryptMessage(reader.readLine());
       if (input == null) {
         input = "back";
       } else {
@@ -178,11 +179,11 @@ public class MenuSystem {
         try {
           server.addSensorsToGreenhouse(input + " -" + id);
         } catch (SensorNotAddedToGreenHouseException | IOException e) {
-          writer.write("Could not add sensor. Try 'man -addsensor' for help.");
+          writer.write(server.encryptMessage("Could not add sensor. Try 'man -addsensor' for help."));
           writer.newLine();
           writer.flush();
         } catch (NoExistingGreenHouseException e) {
-          writer.write("Could not find greenhouse to add sensor to.");
+          writer.write(server.encryptMessage("Could not find greenhouse to add sensor to."));
           writer.newLine();
           writer.flush();
         }
@@ -191,16 +192,16 @@ public class MenuSystem {
           writer.write(server.handleSensorReadingRequest(input + " -" + id));
           writer.newLine();
           writer.flush();
-        } catch (IOException e) {
-          writer.write("Could not process sensor reading request. Try 'man -sensorreading' for help.");
+        } catch (IOException e){
+          writer.write(server.encryptMessage("Could not process sensor reading request. Try 'man -sensorreading' for help."));
           writer.newLine();
           writer.flush();
-        } catch (NoExistingGreenHouseException e) {
-          writer.write("Could not find greenhouse to read sensor from.");
+        } catch (NoExistingGreenHouseException e){
+          writer.write(server.encryptMessage("Could not find greenhouse to read sensor from."));
           writer.newLine();
           writer.flush();
-        } catch (IllegalArgumentException e) {
-          writer.write("Invalid sensor ID provided for reading. Try 'man -sensorreading' for help.");
+        } catch (IllegalArgumentException e){
+          writer.write(server.encryptMessage("Invalid sensor ID provided for reading. Try 'man -sensorreading' for help."));
           writer.newLine();
           writer.flush();
         }
@@ -217,20 +218,20 @@ public class MenuSystem {
           writer.flush();
         }
 
-      } else if (input.startsWith("man")) {
-        String manualResponse = CommandProcessor.handleManualRequest(input);
-        writer.write(manualResponse);
-        writer.newLine();
-        writer.flush();
-      }
+      } else if (input.startsWith("man")){
+          String manualResponse = CommandProcessor.handleManualRequest(input);
+          writer.write(server.encryptMessage(manualResponse));
+          writer.newLine();
+          writer.flush();
+        }
 
       switch (input) {
         case "help" -> {
-          writer.write("Commands:");
+          writer.write(server.encryptMessage("Commands:"));
           writer.newLine();
-          writer.write("'sensors' - List all sensors in this greenhouse.");
+          writer.write(server.encryptMessage("'sensors' - List all sensors in this greenhouse."));
           writer.newLine();
-          writer.write("'back' - Return to the previous menu.");
+          writer.write(server.encryptMessage("'back' - Return to the previous menu."));
           writer.newLine();
           writer.flush();
         }
@@ -238,7 +239,7 @@ public class MenuSystem {
           return;
         }
         case "sensors" -> {
-          writer.write(gh.getAllSensorsInformation());
+          writer.write(server.encryptMessage(gh.getAllSensorsInformation()));
           writer.newLine();
           writer.flush();
         }
