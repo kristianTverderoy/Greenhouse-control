@@ -13,6 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class GreenHouseTest {
   private GreenHouse greenHouse;
 
+  /**
+   * Constructs the instance of the greenhouse before each test.
+   */
   @BeforeEach
   public void init() {
     greenHouse = new GreenHouse(1);
