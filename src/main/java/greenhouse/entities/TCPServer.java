@@ -17,7 +17,13 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import greenhouse.entities.filehandling.GreenHouseDTO;
+import greenhouse.entities.filehandling.JsonReader;
 import greenhouse.entities.filehandling.JsonWriter;
+import greenhouse.entities.filehandling.SensorDTO;
+import greenhouse.entities.filehandling.SoilDTO;
+import greenhouse.entities.filehandling.AirDTO;
+import greenhouse.entities.filehandling.ApplianceDTO;
 
 public class TCPServer extends ClockSubscriber {
 
@@ -56,6 +62,7 @@ public class TCPServer extends ClockSubscriber {
   public void run() {
     if (!isOn) {
       startServer();
+      initializeSavedGreenHouses();
     }
 
     try (ServerSocket ss = new ServerSocket(port)) {
@@ -653,6 +660,73 @@ public class TCPServer extends ClockSubscriber {
     JsonWriter writer = new JsonWriter();
     for (GreenHouse greenHouse : this.greenHouses) {
       writer.saveGreenhouse(greenHouse);
+    }
+  }
+
+  private void initializeSavedGreenHouses() {
+    try {
+      JsonReader reader = new JsonReader();
+      List<GreenHouseDTO> greenhousesDTO = reader.readAllGreenHouses();
+
+      for (GreenHouseDTO greenhouseDTO : greenhousesDTO) {
+        AirDTO airDTO = greenhouseDTO.getAir();
+        Air air = new Air(airDTO.getTargetTemperature(),
+                          airDTO.getTargetHumidity(),
+                          airDTO.getTargetLux());
+
+        SoilDTO soilDTO = greenhouseDTO.getSoil();
+        Soil soil = new Soil(soilDTO.getSoilMoisture(),
+                            soilDTO.getPhValue(),
+                            soilDTO.getNitrogen()
+                            );
+
+        // Make greenhouse
+        GreenHouse greenHouse = new GreenHouse(greenhouseDTO.getGreenHouseId(),
+                                              soil,
+                                              air
+                                              );
+
+        List<SensorDTO> sensors = greenhouseDTO.getSensors();
+        List<ApplianceDTO> appliances = greenhouseDTO.getAppliances();
+
+        for (SensorDTO sensorDTO : sensors) { //Add all sensors to the greenhouse
+          String sensorType = sensorDTO.getType().toLowerCase();
+          switch (sensorType) {
+            case "humidity", "humiditysensor" -> greenHouse.addHumiditySensor();
+            case "light", "lightsensor" -> greenHouse.addLightSensor();
+            case "ph", "phsensor" -> greenHouse.addPhSensor();
+            case "temperature", "temperaturesensor" -> greenHouse.addTemperatureSensor();
+            case "moisture", "moisturesensor" -> greenHouse.addMoistureSensor();
+            case "nitrogen", "nitrogensensor" -> greenHouse.addNitrogenSensor();
+            default -> System.err.println("Unknown sensor type: " + sensorType);
+          }
+        }
+
+        for (ApplianceDTO applianceDTO : appliances) { //Add all appliances to the greenhouse
+          String applianceType = applianceDTO.getType().toLowerCase();
+          switch (applianceType) {
+            case "aircondition", "airconditioner" -> greenHouse.addAppliance(
+                new Aircondition(greenHouse.getNextAvailableApplianceId()));
+            case "fertilizer" -> greenHouse.addAppliance(
+                new Fertilizer(greenHouse.getNextAvailableApplianceId()));
+            case "humidifier" -> greenHouse.addAppliance(
+                new Humidifier(greenHouse.getNextAvailableApplianceId()));
+            case "lamp", "light" -> greenHouse.addAppliance(
+                new Lamp(greenHouse.getNextAvailableApplianceId()));
+            case "limer", "lime" -> greenHouse.addAppliance(
+                new Limer(greenHouse.getNextAvailableApplianceId()));
+            case "sprinkler" -> greenHouse.addAppliance(
+                new Sprinkler(greenHouse.getNextAvailableApplianceId()));
+            default -> System.err.println("Unknown appliance type: " + applianceType);
+          }
+        }
+
+        this.greenHouses.add(greenHouse);
+      }
+
+
+    } catch (IOException e) {
+      //No greenhouses
     }
   }
 
