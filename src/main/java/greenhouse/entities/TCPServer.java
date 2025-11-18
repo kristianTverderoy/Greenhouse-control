@@ -25,7 +25,8 @@ public class TCPServer extends ClockSubscriber {
   private final MenuSystem menuSystem;
   private static final String ENCRYPTION_ALGORITHM = "AES";
   private static final SecretKey SECRET_KEY = new SecretKeySpec(Base64.getDecoder().decode("m0VxcSPFs+2cuMUfh6tjWMj90eihSDGpc1cLr/B9e1Y="), ENCRYPTION_ALGORITHM);
-  private int greenHouseToListenTo = -1;
+  private int greenHouseToListenTo = 0;
+  private int activeMonitoringClients = 0;
 
 
   /**
@@ -532,11 +533,7 @@ public class TCPServer extends ClockSubscriber {
    */
   @Override
   public void tick() {
-    if (greenHouseToListenTo == -1) {
-      notifySubscribers("Error: You are not listening to a greenhouse.");
-    } else {
-      notifySubscribers(greenHouses.get(greenHouseToListenTo).getAllSensorsInformation());
-    }
+    notifySubscribers(greenHouses.get(greenHouseToListenTo).getAllSensorsInformation());
   }
 
   /**
@@ -550,13 +547,30 @@ public class TCPServer extends ClockSubscriber {
     greenHouseToListenTo = id;
   }
 
+  public void subscribeClientToGreenhouseUpdates(GreenHouse gh, BufferedWriter writer) {
+    addSubscriber(null, writer);
+    if (activeMonitoringClients == 0) {
+      startListeningToGreenhouse(gh.getID());
+    }
+    activeMonitoringClients++;
+  }
+
+  public void unsubscribeClientFromGreenhouseUpdates(BufferedWriter writer) {
+    subscribedClients.removeIf(clientConnection -> clientConnection.writer().equals(writer));
+
+    activeMonitoringClients--;
+    if (activeMonitoringClients <= 0){
+      stopListeningToGreenHouse();
+      activeMonitoringClients = 0;
+    }
+  }
+
   /**
    * Unsubscribes the server from the clock and sets the id of the
    * greenhouse the client is listening to, to -1.
    */
   public void stopListeningToGreenHouse() {
     Clock.getInstance().removeSubscriber(Clock.getInstance().getLastSubscriber());
-    greenHouseToListenTo = -1;
   }
 
   /**
