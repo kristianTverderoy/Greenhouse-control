@@ -284,7 +284,6 @@ public class TCPServer {
       throw new NoExistingGreenHouseException();
     }
 
-    boolean splitSuccessful = false;
     try {
       String[] parts = message.split("-");
       String[] sensors = parts[1].split(" ");
@@ -325,7 +324,6 @@ public class TCPServer {
       throw new NoExistingGreenHouseException();
     }
 
-    boolean splitSuccessful = false;
     try {
       String[] parts = message.split("-");
       String[] appliances = parts[1].split(" ");
