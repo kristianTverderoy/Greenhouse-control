@@ -9,6 +9,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
 
+import greenhouse.entities.appliances.*;
+
 //TODO: Klasse skal i util pakke, eller ui pakke?
 
 /**
@@ -161,10 +163,8 @@ public class MenuSystem {
       if (!hasShownMenu) {
         writer.write(server.encryptMessage("\nGreenhouse " + id));
         writer.newLine();
-        writer.write(server.encryptMessage("Sensors: " + gh.getAllSensorsInformation()));
-        writer.newLine();
-        writer.write(server.encryptMessage("Commands: 'help' | 'sensors' | 'back' | 'addsensor' | 'sensorreading' | "
-                + "'addappliance' | 'appliancereading"));
+        writer.write(server.encryptMessage("Commands: 'help' | 'back' | 'addsensor' | 'sensorreading' | "
+                + "'addappliance' | 'appliance' "));
         writer.newLine();
         writer.flush();
         hasShownMenu = true;
