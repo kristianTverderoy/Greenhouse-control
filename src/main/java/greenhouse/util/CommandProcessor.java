@@ -30,7 +30,7 @@ public class CommandProcessor {
                 + "Example: 'addsensor -temperaturesensor' will add a temperature sensor to the greenhouse"
                 +" you're in the menu of.\n"
                 + "To add multiple sensors at the same time, separate each type with a space.\n"
-                + "Example: 'addsensor -temperaturesensor humiditysensor phsensor'";
+                + "Example: 'addsensor -temperaturesensor humiditysensor phsensorsensor'";
 
         case "addappliance" -> "To add an appliance to a greenhouse, use the command: "
                 + "addappliance -<type>.\n"
