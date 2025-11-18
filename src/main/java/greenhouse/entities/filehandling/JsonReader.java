@@ -42,8 +42,8 @@ public class JsonReader {
   public List<GreenHouseDTO> readAllGreenHouses() throws IOException {
     List<GreenHouseDTO> greenHouses = new ArrayList<>();
     
-    // Keep reading greenhouse files starting from 1 until no more are found
-    int i = 1;
+    // Keep reading greenhouse files starting from 0 until no more are found
+    int i = 0;
     while (true) {
       try {
         GreenHouseDTO greenhouse = readGreenHouseFile(i);
