@@ -1,6 +1,7 @@
 package greenhouse.entities;
 
 import greenhouse.util.CommandProcessor;
+import greenhouse.entities.appliances.ApplianceNotAddedToGreenHouseException;
 import greenhouse.entities.sensors.SensorNotAddedToGreenHouseException;
 
 import java.io.BufferedReader;
@@ -162,7 +163,8 @@ public class MenuSystem {
         writer.newLine();
         writer.write(server.encryptMessage("Sensors: " + gh.getAllSensorsInformation()));
         writer.newLine();
-        writer.write(server.encryptMessage("Commands: 'help' | 'sensors' | 'back' | 'addsensor' | 'sensorreading'."));
+        writer.write(server.encryptMessage("Commands: 'help' | 'sensors' | 'back' | 'addsensor' | 'sensorreading' | "
+                + "'addappliance' | 'appliancereading"));
         writer.newLine();
         writer.flush();
         hasShownMenu = true;
@@ -200,6 +202,18 @@ public class MenuSystem {
           writer.flush();
         } catch (IllegalArgumentException e){
           writer.write(server.encryptMessage("Invalid sensor ID provided for reading. Try 'man -sensorreading' for help."));
+          writer.newLine();
+          writer.flush();
+        }
+      } else if (input.startsWith("addappliance")) {
+        try {
+          server.addApplianceToGreenHouse(input + " -" + id);
+        } catch (ApplianceNotAddedToGreenHouseException | IOException e) {
+          writer.write("Could not add appliance. Try 'man -addappliance' for help.");
+          writer.newLine();
+          writer.flush();
+        } catch (NoExistingGreenHouseException e) {
+          writer.write("Could not find greenhouse to add appliance to.");
           writer.newLine();
           writer.flush();
         }

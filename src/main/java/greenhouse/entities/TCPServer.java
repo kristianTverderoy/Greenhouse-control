@@ -8,7 +8,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import greenhouse.entities.actuators.Actuator;
+import greenhouse.entities.appliances.*;
 import greenhouse.entities.sensors.*;
 
 import javax.crypto.Cipher;
@@ -162,8 +162,8 @@ public class TCPServer {
     //:TODO: Create better cases.
 
 /*
-    if (message.startsWith("actuatorreading")){
-      return handleActuatorReadingRequest(message);
+    if (message.startsWith("appliancereading")){
+      return handleApplianceReadingRequest(message);
     }
 */
 
@@ -227,26 +227,26 @@ public class TCPServer {
   }
 
   /**
-   * Receive actuator status data from any sensor node.
-   */ /*
-  private String handleActuatorReadingRequest(String message) {
+   * Receive appliance status data from any sensor node.
+   */
+  private String handleApplianceReadingRequest(String message) {
     String[] parts = message.split("-");
     GreenHouse greenHouse = greenHouses.get(Integer.parseInt(parts[1].trim()));
     parts[2] = parts[2].trim().toLowerCase();
 
     if (parts[2].equals("a")) {
-      return greenHouse.getAllActuatorsInformation();
+      return greenHouse.getAllAppliancesInformation();
     } else {
-      Actuator actuator = greenHouse.getActuator(Integer.parseInt(parts[2]));
-      if (actuator != null) {
-        return actuator.toString();
+      Appliance appliance = greenHouse.getAppliance(Integer.parseInt(parts[2]));
+      if (appliance != null) {
+        return appliance.toString();
       } else {
-        return "Actuator not found with ID: " + parts[2];
+        return "Appliance not found with ID: " + parts[2];
       }
     }
 
 
-  }*/
+  }
 
 
   /**
@@ -298,18 +298,18 @@ public class TCPServer {
 
       for (String sensor : sensors) {
 
-        switch (sensor) {
-          case "humiditysensor" -> targetGreenhouse.addSensor(new HumiditySensor<>(
-                  targetGreenhouse.getNextAvailableSensorId()));
+      switch(sensor){
+        case "humiditysensor" -> targetGreenhouse.addHumiditySensor();
 
-          case "lightsensor" -> targetGreenhouse.addSensor(new LightSensor<>(
-                  targetGreenhouse.getNextAvailableSensorId()));
+        case "lightsensor" -> targetGreenhouse.addLightSensor();
 
-          case "phsensor" -> targetGreenhouse.addSensor(new PHSensor<>(
-                  targetGreenhouse.getNextAvailableSensorId()));
+        case "phsensor" -> targetGreenhouse.addPhSensor();
 
-          case "temperaturesensor" -> targetGreenhouse.addSensor(new TemperatureSensor<>(
-                  targetGreenhouse.getNextAvailableSensorId()));
+        case "temperaturesensor" -> targetGreenhouse.addTemperatureSensor();
+
+        case "moisturesensor" -> targetGreenhouse.addMoistureSensor();
+
+        case "nitrogensensor" -> targetGreenhouse.addNitrogenSensor();
 
           default -> throw new SensorNotAddedToGreenHouseException();
         }
@@ -317,6 +317,51 @@ public class TCPServer {
       }
     } catch (ArrayIndexOutOfBoundsException e) {
       throw new IOException("The user did not follow the example for input");
+    }
+  }
+
+  public void addAppliancesToGreenhouse(String message) throws ApplianceNotAddedToGreenHouseException, NoExistingGreenHouseException, IOException {
+    if (greenHouses.isEmpty()){
+      throw new NoExistingGreenHouseException();
+    }
+
+    boolean splitSuccessful = false;
+    try {
+      String[] parts = message.split("-");
+      String[] appliances = parts[1].split(" ");
+      int greenhouseId = Integer.parseInt(parts[2].trim());
+
+      GreenHouse targetGreenhouse = greenHouses.stream()
+              .filter(gh -> gh.getID() == greenhouseId)
+              .findFirst()
+              .orElseThrow(NoExistingGreenHouseException::new);
+
+      for (String appliance : appliances) {
+
+        switch (appliance) {
+          case "aircondition" -> targetGreenhouse.addAppliance(
+                  new Aircondition(targetGreenhouse.getNextAvailableApplianceId()));
+
+          case "fertilizer" -> targetGreenhouse.addAppliance(
+                  new Fertilizer(targetGreenhouse.getNextAvailableApplianceId()));
+
+          case "humidifier" -> targetGreenhouse.addAppliance(
+                  new Humidifier(targetGreenhouse.getNextAvailableApplianceId()));
+
+          case "lamp" -> targetGreenhouse.addAppliance(
+                  new Lamp(targetGreenhouse.getNextAvailableApplianceId()));
+
+          case "limer" -> targetGreenhouse.addAppliance(
+                  new Limer(targetGreenhouse.getNextAvailableApplianceId()));
+
+          case "sprinkler" -> targetGreenhouse.addAppliance(
+                  new Sprinkler(targetGreenhouse.getNextAvailableApplianceId()));
+
+          default -> throw new ApplianceNotAddedToGreenHouseException();
+        }
+      }
+    } catch (ArrayIndexOutOfBoundsException e) {
+      throw new IOException("The user did not follow the example input");
     }
   }
 

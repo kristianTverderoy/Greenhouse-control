@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 /**
  * <p>
- *   Represents a soil sample with a ph value and
- *   moisture level.
+ *   Represents a soil sample with a ph value,
+ *   moisture level and nitrogen level.
  * </p>
  * <ul>
  *   <li>
@@ -104,7 +104,7 @@ public class Soil extends ClockSubscriber implements Sensorable {
   /**
    * Adds the given amount of nitrogen to the soil.
    * Reduces the ph of the soil based on the given nitrogen.
-   * Used by a fertilizer actuator.
+   * Used by a fertilizer appliance.
    *
    * @param nitrogenAmount The amount of nitrogen being added to the soil
    *                       in ppm.
@@ -133,7 +133,7 @@ public class Soil extends ClockSubscriber implements Sensorable {
 
   /**
    * Increases the ph by 0.5.
-   * Used by a liming actuator.
+   * Used by a liming appliance.
    */
   public void lime() {
     changePH((float) (0.5));
@@ -172,9 +172,9 @@ public class Soil extends ClockSubscriber implements Sensorable {
    */
   @Override
   public void updateState() {
+    phTick();
     dry();
     useFertilizer();
-    phTick();
     update();
   }
 

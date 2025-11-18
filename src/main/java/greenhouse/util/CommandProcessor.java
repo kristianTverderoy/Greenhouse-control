@@ -18,19 +18,27 @@ public class CommandProcessor {
 
       return switch (parts[1]) {
         case "sensorreading" -> "To specify a sensor to receive information from. Use the command:"
-                + "SensorReading -<id>\n"
+                + "sensorreading -<id>\n"
                 + "Where <id> is select sensor id to read from.\n"
-                + "To read all sensors from the selected greenhouse, type SensorReading -a\n"
+                + "To read all sensors from the selected greenhouse, type sensorreading -a\n"
                 + "Example: 'sensorreading -2' will read the sensor with id 2 in the greenhouse you're in the menu of."
                 + "Likewise, 'sensorreading -a' will read all sensors in the greenhouse you're in the menu of.";
 
         case "addsensor" -> "To add a sensor to a greenhouse, use the command: "
-                + "AddSensor -<type>.\n"
+                + "addsensor -<type>.\n"
                 + "Where <type> is the type of sensor (e.g., temperature, humidity), \n"
-                + "Example: 'AddSensor -temperaturesensor' will add a temperature sensor to the greenhouse"
+                + "Example: 'addsensor -temperaturesensor' will add a temperature sensor to the greenhouse"
                 +" you're in the menu of.\n"
                 + "To add multiple sensors at the same time, separate each type with a space.\n"
-                + "Example: 'AddSensor -temperaturesensor humiditysensor phsensorsensor'";
+                + "Example: 'addsensor -temperaturesensor humiditysensor phsensorsensor'";
+
+        case "addappliances" -> "To add an appliance to a greenhouse, use the command: "
+                + "addappliance -<type>.\n"
+                + "Where <type> is the type of appliance (e.g., aircondition, lamp), \n"
+                + "Example: 'addappliance -lamp' will add a lamp to the greenhouse"
+                +" you're in the menu of.\n"
+                + "To add multiple appliances at the same time, separate each type with a space.\n"
+                + "Example: 'addappliances -lamp humidifier fertilizer'";
 
 
         default -> "Did not find that item in 'man'.";
