@@ -14,8 +14,13 @@ import java.util.Scanner;
  * sends and receives messages, and can subscribe to server updates.
  */
 public class TCPClient {
+  private Socket socket;
   private BufferedReader bufferedReader;
   private BufferedWriter bufferedWriter;
+  private volatile boolean isConnected = false;
+  private volatile boolean shouldReconnect = true;
+  private static final int MAX_RECONNECT_ATTEMPTS = 5;
+  private static final int INITIAL_DELAY_MS = 1000;
   private static final String ENCRYPTION_ALGORITHM = "AES";
   private static final SecretKey SECRET_KEY = new SecretKeySpec(Base64.getDecoder().decode("m0VxcSPFs+2cuMUfh6tjWMj90eihSDGpc1cLr/B9e1Y="), ENCRYPTION_ALGORITHM);
 
@@ -24,51 +29,179 @@ public class TCPClient {
    */
   public TCPClient(){}
 
+  public void connectToServer(String host, int port) {
+      Scanner scanner = new Scanner(System.in);
 
-  //TODO: Remove sout statements when no longer necessary for debugging.
-  public void connectToServer(String host, int port){
-    try (Socket socket = new Socket(host, port);
-         InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
-         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
-         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-         BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
-         Scanner scanner = new Scanner(System.in)) {
+      try {
+          socket = new Socket(host, port);
+          bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+          bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+          isConnected = true;
+      } catch (IOException e) {
+          System.err.println("Could not connect to server: " + e.getMessage());
+          isConnected = false;
+      }
 
-      this.bufferedReader = bufferedReader;
-      this.bufferedWriter = bufferedWriter;
+      Thread listenerThread = createAndStartListenerIfConnected();
 
-      // Thread to listen for server messages:
+      while (shouldReconnect) {
+          String messageToSend = scanner.nextLine();
+
+          if (messageToSend.equalsIgnoreCase("reconnect")) {
+              isConnected = false;
+              closeResources();
+
+              if (attemptReconnection(host, port)) {
+                  listenerThread = createAndStartListenerIfConnected();
+                  continue;
+              } else {
+                  System.out.println("Failed to reconnect. Type 'reconnect' to try again or 'exit' to quit.");
+                  continue;
+              }
+          }
+
+          if (messageToSend.equalsIgnoreCase("exit")) {
+              shouldReconnect = false;
+              isConnected = false;
+              closeResources();
+              return;
+          }
+
+          if (isConnected) {
+              try {
+                  String encryptedMessage = encryptMessage(messageToSend);
+                  bufferedWriter.write(encryptedMessage);
+                  bufferedWriter.newLine();
+                  bufferedWriter.flush();
+              } catch (IOException e) {
+                  System.err.println("Failed to send message: " + e.getMessage());
+                  isConnected = false;
+                  closeResources();
+              }
+          } else {
+              System.out.println("Not connected. Type 'reconnect' to reconnect or 'exit' to quit.");
+          }
+      }
+  }
+
+  /**
+   * Creates and starts a listener thread if connected.
+   * @return the started thread, or null if not connected
+   */
+  private Thread createAndStartListenerIfConnected() {
+      if (!isConnected || bufferedReader == null) return null;
+
       Thread listenerThread = new Thread(() -> {
-        try {
-          String serverMessage;
-          while ((serverMessage = bufferedReader.readLine()) != null) {
-            System.out.println(decryptMessage(serverMessage));
+          try {
+              String serverMessage;
+              while (isConnected && (serverMessage = bufferedReader.readLine()) != null) {
+                  System.out.println(decryptMessage(serverMessage));
+              }
+          } catch (IOException e) {
+              if (isConnected) {
+                  System.err.println("Connection to server lost: " + e.getMessage());
+                  isConnected = false;
+              }
           }
-        } catch (IOException e) {
-          System.err.println("Connection to server lost: " + e.getMessage());
-          }
-        });
+      });
       listenerThread.setDaemon(true);
       listenerThread.start();
+      return listenerThread;
+  }
 
-      // Main loop only sends messages to server.
-      boolean disconnected = false;
-      while (!disconnected) {
+//  //TODO: Remove sout statements when no longer necessary for debugging.
+//  public void connectToServer(String host, int port){
+//    try (Socket socket = new Socket(host, port);
+//         InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
+//         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
+//         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+//         BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
+//         Scanner scanner = new Scanner(System.in)) {
+//
+//      this.bufferedReader = bufferedReader;
+//      this.bufferedWriter = bufferedWriter;
+//
+//      // Thread to listen for server messages:
+//      Thread listenerThread = new Thread(() -> {
+//        try {
+//          String serverMessage;
+//          while ((serverMessage = bufferedReader.readLine()) != null) {
+//            System.out.println(decryptMessage(serverMessage));
+//          }
+//        } catch (IOException e) {
+//          System.err.println("Connection to server lost: " + e.getMessage());
+//          }
+//        });
+//      listenerThread.setDaemon(true);
+//      listenerThread.start();
+//
+//      // Main loop only sends messages to server.
+//      boolean disconnected = false;
+//      while (!disconnected) {
+//
+//        String messageToSend = scanner.nextLine();
+//        String encryptedMessage = encryptMessage(messageToSend);
+//
+//        bufferedWriter.write(encryptedMessage);
+//        bufferedWriter.newLine();
+//        bufferedWriter.flush();
+//
+//        if (messageToSend.equalsIgnoreCase("exit")){
+//          disconnected = true;
+//        }
+//      }
+//    } catch (Exception e){
+//      System.err.println("Could not connect to server: " + e.getMessage());
+//    }
+//  }
 
-        String messageToSend = scanner.nextLine();
-        String encryptedMessage = encryptMessage(messageToSend);
+  /**
+   * Attempts to reconnect to the server with exponential backoff.
+   * @param host server hostname or IP
+   * @param port server port number
+   * @return true if reconnection successful, false otherwise
+   */
+  private boolean attemptReconnection(String host, int port) {
+      int attempts = 0;
+      int delay = INITIAL_DELAY_MS;
 
-        bufferedWriter.write(encryptedMessage);
-        bufferedWriter.newLine();
-        bufferedWriter.flush();
+      while (attempts < MAX_RECONNECT_ATTEMPTS) {
+          try {
+              System.out.println("Reconnecting... Attempt " + (attempts + 1) + "/" + MAX_RECONNECT_ATTEMPTS);
+              Thread.sleep(delay);
 
-        if (messageToSend.equalsIgnoreCase("exit")){
-          disconnected = true;
-        }
+              socket = new Socket(host, port);
+              bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+              bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+              isConnected = true;
+
+              System.out.println("Reconnected successfully!");
+              return true;
+
+          } catch (IOException | InterruptedException e) {
+              attempts++;
+              delay = Math.min(delay * 2, 30000);
+
+              if (attempts >= MAX_RECONNECT_ATTEMPTS) {
+                  System.err.println("Max reconnection attempts reached. Failed to reconnect.");
+                  return false;
+              }
+          }
       }
-    } catch (Exception e){
-      System.err.println("Could not connect to server: " + e.getMessage());
-    }
+      return false;
+  }
+
+  /**
+   * Closes all connection resources safely.
+   */
+  private void closeResources() {
+      try {
+          if (bufferedWriter != null) bufferedWriter.close();
+          if (bufferedReader != null) bufferedReader.close();
+          if (socket != null && !socket.isClosed()) socket.close();
+      } catch (IOException e) {
+          System.err.println("Error closing resources: " + e.getMessage());
+      }
   }
 
   /**
