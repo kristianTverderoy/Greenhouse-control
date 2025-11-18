@@ -178,6 +178,9 @@ public class MenuSystem {
       if (input.startsWith("addsensor")) {
         try {
           server.addSensorsToGreenhouse(input + " -" + id);
+          writer.write(server.encryptMessage("Sensor(s) added successfully."));
+          writer.newLine();
+          writer.flush();
         } catch (SensorNotAddedToGreenHouseException | IOException e) {
           writer.write(server.encryptMessage("Could not add sensor. Try 'man -addsensor' for help."));
           writer.newLine();
@@ -285,7 +288,40 @@ public class MenuSystem {
         case "back" -> {
           return;
         }
+
+        case "monitor" -> handleGreenhouseSensorMonitoring(gh, writer, reader);
+
       }
+    }
+  }
+
+  private void handleGreenhouseSensorMonitoring(GreenHouse gh, BufferedWriter writer, BufferedReader reader) throws IOException {
+    writer.write(server.encryptMessage("Sensor monitoring started for Greenhouse " + gh.getID()));
+    writer.newLine();
+    writer.write(server.encryptMessage("Type 'stop' to stop monitoring."));
+    writer.newLine();
+    writer.flush();
+
+    server.subscribeClientToGreenhouseUpdates(gh, writer);
+
+    try {
+
+      while (server.isOn()) {
+        String input = server.decryptMessage(reader.readLine());
+        if (input == null) {
+          server.stopListeningToGreenHouse();
+          break;
+        }
+        if (input.toLowerCase().trim().equals("stop") || input.toLowerCase().trim().equals("back")) {
+          server.stopListeningToGreenHouse();
+          writer.write(server.encryptMessage("Sensor monitoring stopped."));
+          writer.newLine();
+          writer.flush();
+          break;
+        }
+      }
+    } finally {
+      server.unsubscribeClientFromGreenhouseUpdates(writer);
     }
   }
 
