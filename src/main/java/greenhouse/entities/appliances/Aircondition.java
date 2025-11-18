@@ -4,7 +4,7 @@ package greenhouse.entities.appliances;
  * Appliance responsible for temperature control in the greenhouse.
  * Can operate in cooling or heating mode to maintain optimal temperature.
  */
-public class Aircondition extends Appliance {
+public class Aircondition extends AirAppliance {
 
   private boolean cooling = false;
   private boolean heating = false;
@@ -73,6 +73,11 @@ public class Aircondition extends Appliance {
       this.cooling = false;
       this.heating = false;
     }
+  }
+
+  @Override
+  public void actuate() {
+    togglePower();
   }
   
 }

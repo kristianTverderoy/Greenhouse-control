@@ -206,7 +206,7 @@ public class MenuSystem {
         }
       } else if (input.startsWith("addappliance")) {
         try {
-          server.addApplianceToGreenHouse(input + " -" + id);
+          server.addAppliancesToGreenhouse(input + " -" + id);
         } catch (ApplianceNotAddedToGreenHouseException | IOException e) {
           writer.write("Could not add appliance. Try 'man -addappliance' for help.");
           writer.newLine();
