@@ -156,11 +156,10 @@ public class Clock {
   /**
    * Removes the subscriber with the given subscriber id.
    *
-   * @param id The id of the subscriber is the clock's
-   *           list of subscribers.
+   * @param subscriber the ClockSubscriber to remove from the list of subscribers.
    */
-  public void removeSubscriber(int id) {
-    subscribers.remove(id);
+  public void removeSubscriber(ClockSubscriber subscriber) {
+    subscribers.remove(subscriber);
   }
 
   /**
