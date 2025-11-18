@@ -136,54 +136,6 @@ public class TCPServer extends ClockSubscriber {
   }
 
   /**
-   * The various messages the server can handle from clients.
-   *
-   * @param messageFromClient The request message sent from the client.
-   * @return The response message to be sent back to the client.
-   */
-  private String handleMessage(String messageFromClient) {
-    String message = messageFromClient.toLowerCase().trim();
-    if (message.startsWith("addsensor")) {
-      try {
-        addSensorsToGreenhouse(message);
-        return "The sensor(s) was added succesfully";
-      } catch (SensorNotAddedToGreenHouseException e) {
-        return "There was a problem adding the sensor to the greenhouse.";
-      } catch (NoExistingGreenHouseException e) {
-        return "There is no greenhouse created yet";
-      } catch (IOException e) {
-        return "Wrong input. Please follow the example";
-      }
-
-    }
-//    if (message.startsWith("sensorreading")) {
-//      return handleSensorReadingRequest(message);
-//    }
-
-    //:TODO: Create better cases.
-
-/*
-    if (message.startsWith("appliancereading")){
-      return handleApplianceReadingRequest(message);
-    }
-*/
-
-    return switch (message) {
-      case "status" -> "Server is running";
-      case "getallgreenhouses" -> getListOfAllGreenHouses();
-      case "ison" -> Boolean.toString(isOn);
-      case "info" -> "Server information";
-      case "help" -> "Available commands: Status, GetAllGreenHouses, IsOn, Info, Help, AvailableSensors";
-      case "availablesensors" -> "'HumiditySensor', 'LightSensor', 'PHSensor', 'TemperatureSensor'"
-              + "Example: 'AddSensors -0 HumiditySensor ' this adds a humidity sensor to greenhouse nr.0."
-              + " \n \n Example for multiple sensors: 'AddSensors -2 -LightSensor HumiditySensor TemperatureSensor'."
-              + " This adds multiple sensors at the same time, to Greenhouse nr.2.";
-      case "newgreenhouse" -> createNewGreenhouse();
-      default -> "Unknown command";
-    };
-  }
-
-  /**
    * Handles a sensor reading request from the client and returns sensor data.
    *
    * <p>This method parses the command string to extract the greenhouse ID and sensor specification,
@@ -221,7 +173,6 @@ public class TCPServer extends ClockSubscriber {
           throw new IllegalArgumentException("Invalid sensor ID format.");
         }
       }
-
     } catch (IndexOutOfBoundsException e) {
       throw new IOException("The user did not follow the example for input");
     }
@@ -229,26 +180,73 @@ public class TCPServer extends ClockSubscriber {
 
   /**
    * Receive appliance status data from any sensor node.
+   *
+   * @param message the command string in the format: "applianceReading -<applianceId|'a'> <greenhouseId>"
+   *
+   * @throws NoExistingGreenHouseException if there are no existing greenhouses in the list.
+   * @throws IOException if the message format is incorrect or cannot be parsed.
+   * @throws IllegalArgumentException if the appliance ID format is invalid or appliance not found.
    */
-  private String handleApplianceReadingRequest(String message) {
+  public String handleApplianceReadingRequest(String message) throws IOException, IllegalArgumentException, NoExistingGreenHouseException {
+    if (greenHouses.isEmpty()){
+      throw new NoExistingGreenHouseException();
+    }
+    try {
     String[] parts = message.split("-");
-    GreenHouse greenHouse = greenHouses.get(Integer.parseInt(parts[1].trim()));
-    parts[2] = parts[2].trim().toLowerCase();
+      GreenHouse greenHouse = greenHouses.get(Integer.parseInt(parts[2].trim()));
 
-    if (parts[2].equals("a")) {
+    parts[1] = parts[1].trim().toLowerCase();
+
+    if (parts[1].equals("a")) {
       return greenHouse.getAllAppliancesInformation();
     } else {
-      Appliance appliance = greenHouse.getAppliance(Integer.parseInt(parts[2]));
-      if (appliance != null) {
-        return appliance.toString();
-      } else {
-        return "Appliance not found with ID: " + parts[2];
+      try {
+
+        Appliance appliance = greenHouse.getAppliance(Integer.parseInt(parts[1]));
+        if (appliance != null) {
+          return appliance.toString();
+        } else {
+          return "Appliance not found with ID: " + parts[1];
+        }
+      } catch (NumberFormatException e) {
+        throw new IllegalArgumentException("Invalid appliance ID format.");
+      }
+    }
+      } catch (IndexOutOfBoundsException e) {
+        throw new IOException("The user did not follow the example for input");
       }
     }
 
-
-  }
-
+  /**
+   * Toggles an appliance on or off based on client request.
+   *
+   * @param message the command string in the format: "toggleAppliance -<applianceId> <greenhouseId>"
+   * @throws NoExistingGreenHouseException if there are no existing greenhouses in the list.
+   * @throws IOException if the message format is incorrect or cannot be parsed.
+   * @throws IllegalArgumentException if the appliance ID format is invalid or appliance not found.
+   */
+    public void toggleAppliance(String message) throws NoExistingGreenHouseException, IOException, IllegalArgumentException {
+    if (greenHouses.isEmpty()) {
+      throw new NoExistingGreenHouseException();
+    }
+    try {
+      String[] parts = message.split("-");
+      GreenHouse greenHouse = greenHouses.get(Integer.parseInt(parts[2].trim()));
+      parts[1] = parts[1].trim().toLowerCase();
+        try {
+          Appliance appliance = greenHouse.getAppliance(Integer.parseInt(parts[1]));
+          if (appliance != null) {
+            greenHouse.actuateAppliance(Integer.parseInt(parts[1]));
+          } else {
+            throw new IllegalArgumentException("Appliance not found with ID: " + parts[1]);
+          }
+        } catch (NumberFormatException e) {
+          throw new IllegalArgumentException("Invalid appliance ID format.");
+        }
+      } catch (IndexOutOfBoundsException e) {
+        throw new IOException("The user did not follow the example for input");
+    }
+    }
 
   /**
    * Creates a new greenhouse and adds it to the threadsafe array list.
