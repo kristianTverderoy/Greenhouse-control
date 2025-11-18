@@ -32,13 +32,18 @@ public class CommandProcessor {
                 + "To add multiple sensors at the same time, separate each type with a space.\n"
                 + "Example: 'addsensor -temperaturesensor humiditysensor phsensorsensor'";
 
-        case "addappliances" -> "To add an appliance to a greenhouse, use the command: "
+        case "addappliance" -> "To add an appliance to a greenhouse, use the command: "
                 + "addappliance -<type>.\n"
                 + "Where <type> is the type of appliance (e.g., aircondition, lamp), \n"
                 + "Example: 'addappliance -lamp' will add a lamp to the greenhouse"
                 +" you're in the menu of.\n"
                 + "To add multiple appliances at the same time, separate each type with a space.\n"
-                + "Example: 'addappliances -lamp humidifier fertilizer'";
+                + "Example: 'addappliance -lamp humidifier fertilizer'";
+
+        case "toggleappliance" -> "To toggle on/off an appliance, use the command: "
+                + "appliance -<number>.\n"
+                + "Where <number> is the id of the appliance you want to toggle (e.g 1), \n "
+                + "Example: 'toggleappliance -3' will toggle on/off the appliance with the id 3";
 
 
         default -> "Did not find that item in 'man'.";
