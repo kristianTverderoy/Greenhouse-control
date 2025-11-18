@@ -26,7 +26,7 @@ public class MenuSystem {
    * Creates a new MenuSystem instance.
    *
    * @param greenHouses the list of greenhouses to manage
-   * @param server      the TCP server instance
+   * @param server the TCP server instance
    */
   public MenuSystem(List<GreenHouse> greenHouses, TCPServer server) {
     this.greenHouses = greenHouses;
@@ -54,7 +54,7 @@ public class MenuSystem {
   public void showStartMenu(BufferedWriter writer) throws IOException {
     writer.write(server.encryptMessage("\nMenu:"));
     writer.newLine();
-    writer.write(server.encryptMessage("Commands: greenhouses | help | exit"));
+    writer.write(server.encryptMessage("Commands: greenhouses | saveserverstate | help | exit"));
     writer.newLine();
     writer.flush();
   }
@@ -139,7 +139,7 @@ public class MenuSystem {
    * Handles the details menu for a specific greenhouse.
    * Allows users to view sensors, add sensors, and read sensor data.
    *
-   * @param id     the ID of the greenhouse to display details for
+   * @param id the ID of the greenhouse to display details for
    * @param reader the buffered reader to read user input from
    * @param writer the buffered writer to send output to the client
    * @throws IOException if an I/O error occurs during communication
