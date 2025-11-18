@@ -298,7 +298,7 @@ public class MenuSystem {
           writer.newLine();
           writer.flush();
         }
-      } else if (input.startsWith("newtemptarget")) {
+} else if (input.startsWith("newtemptarget")) {
         try {
           server.updateGreenhouseTempTarget(input + " -" + id);
           writer.write(server.encryptMessage("Temperature target updated successfully."));
@@ -335,8 +335,7 @@ public class MenuSystem {
           writer.write(server.encryptMessage("Invalid humidity target provided. Try man -newhumiditytarget' for help."));
           writer.newLine();
           writer.flush();
-        }
-      } else if (input.startsWith("man")) {
+        }      } else if (input.startsWith("man")) {
         String manualResponse = CommandProcessor.handleManualRequest(input);
         writer.write(server.encryptMessage(manualResponse));
         writer.newLine();
