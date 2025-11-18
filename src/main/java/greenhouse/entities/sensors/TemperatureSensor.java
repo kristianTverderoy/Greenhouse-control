@@ -13,16 +13,6 @@ public class TemperatureSensor<T> extends Sensor<T> implements AirSubscriber {
   }
 
   @Override
-  public void start() {
-
-  }
-
-  @Override
-  public void stop() {
-    
-  }
-
-  @Override
   public void subscribe(Air air) {
     air.addSubscriber(this);
   }
@@ -36,9 +26,11 @@ public class TemperatureSensor<T> extends Sensor<T> implements AirSubscriber {
   public String toString() {
     return "TemperatureSensor{" +
             "id=" + getId() +
-            ", isActive=" + isActive() +
-            ", isConnected=" + isConnected() +
-            ", isAlertState=" + isInAlertState() +
+            ", temperature=" + latestTemperatureReading +
             '}';
+  }
+
+  public double getTemperature() {
+    return latestTemperatureReading;
   }
 }

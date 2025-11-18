@@ -1,28 +1,33 @@
 package greenhouse.entities;
 
+import greenhouse.entities.appliances.Appliance;
+import greenhouse.entities.appliances.SoilAppliance;
+import greenhouse.entities.sensors.Sensor;
 import greenhouse.entities.sensors.*;
 
-import java.util.List;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GreenHouse {
 
   private final Map<Integer, Sensor<?>> sensors;
-  private List<Sensorable> sensorableObjects;
+  private final Map<Integer, Appliance> appliances;
   private final int greenHouseID;
   private Soil soil;
   private Air air;
 
+
   public GreenHouse(int greenHouseID) {
     this.sensors = new ConcurrentHashMap<>();
+    this.appliances = new ConcurrentHashMap<>();
     this.greenHouseID = greenHouseID;
     initiateAirAndSoil();
   }
 
   public void addSensor(Sensor<?> sensor) {
     this.sensors.put(sensor.getId(), sensor);
-    
+
     if (sensor instanceof AirSubscriber airSubscriber) {
       airSubscriber.subscribe(this.air);
     }
@@ -51,6 +56,17 @@ public class GreenHouse {
     addSensor(new TemperatureSensor<>(getNextAvailableSensorId(), air));
   }
 
+  public void addNitrogenSensor() {
+    addSensor(new NitrogenSensor<>(getNextAvailableSensorId(), soil));
+  }
+
+  public void addAppliance(Appliance appliance) {
+    if (appliance instanceof SoilAppliance) {
+      ((SoilAppliance) appliance).addSoil(this.soil);
+    }
+    this.appliances.put(appliance.getId(), appliance);
+  }
+
   public int getID(){
     return this.greenHouseID;
   }
@@ -67,19 +83,44 @@ public class GreenHouse {
     this.air = new Air(20, 60, 10000);
   }
   /**
-   * Due to zero based indexing the next available id is at the last id + 1.
-   * Since sensors.size doesnt care about zero based indexing, the next available id is just
+   * Due to zero-based indexing, the next available id is at the last id + 1.
+   * Since sensors. Size doesn't care about zero based indexing, the next available id is just
    * the number we get from taking the length of the list.
-   * 
+   *
    * @return The next available id number for a sensor.
    */
   public int getNextAvailableSensorId(){
     return sensors.size();
   }
 
+  /**
+   * Due to zero-based indexing, the next available id is at the last id + 1.
+   * Since appliances.size() doesn't care about zero based indexing, the next available id is just
+   * the number we get from taking the length of the map.
+   *
+   * @return The next available id number for an appliance.
+   */
+  public int getNextAvailableApplianceId(){
+    return appliances.size();
+  }
+
   public String getAllSensorsInformation() {
     StringBuilder sb = new StringBuilder();
     sensors.forEach((id, sensor) -> sb.append(sensor.toString()).append("\n"));
     return sb.toString();
+  }
+
+  public Appliance getAppliance(int id) {
+    return this.appliances.get(id);
+  }
+
+  public String getAllAppliancesInformation() {
+    StringBuilder sb = new StringBuilder();
+    appliances.forEach((id, appliance) -> sb.append(appliance.toString()).append("\n"));
+    return sb.toString();
+  }
+
+  public void actuateAppliance(int id) {
+    this.appliances.get(id).actuate();
   }
 }
