@@ -5,9 +5,11 @@ import com.google.gson.GsonBuilder;
 import greenhouse.entities.Air;
 import greenhouse.entities.GreenHouse;
 import greenhouse.entities.Soil;
-import greenhouse.entities.actuators.Actuator;
+import greenhouse.entities.appliances.Appliance;
+import greenhouse.entities.appliances.AirAppliance;
 import greenhouse.entities.sensors.Sensor;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ import java.util.List;
 public class JsonWriter {
 
   private final Gson gson;
+  private static final String RESOURCES_PATH = "src/main/resources/greenhouses";
 
   /**
    * Creates a new JsonWriter with pretty printing enabled.
@@ -28,73 +31,60 @@ public class JsonWriter {
   }
 
   /**
-   * Saves a greenhouse and its state (sensors, appliances, air, soil) to a JSON file.
+   * Saves a greenhouse with its complete state (sensors, appliances, air, soil).
+   * File will be saved as "greenhouse{id}.json" in the resources/greenhouses directory.
+   * Overwrites existing files to prevent duplicates.
    *
-   * @param greenhouse The greenhouse to save
-   * @param sensors The list of sensors in the greenhouse
-   * @param appliances The list of appliances (actuators) in the greenhouse
-   * @param filePath The file path where the JSON should be saved
+   * @param greenhouse The greenhouse to save with its complete state
    * @throws IOException If an error occurs while writing to the file
    */
-  public void saveGreenhouse(GreenHouse greenhouse, List<Sensor<?>> sensors, 
-                             List<Actuator> appliances, String filePath) throws IOException {
-    GreenHouseDTO dto = convertToDTO(greenhouse, sensors, appliances);
+  public void saveGreenhouse(GreenHouse greenhouse) throws IOException {
+    String fileName = "greenhouse" + greenhouse.getID() + ".json";
+    String filePath = RESOURCES_PATH + "/" + fileName;
+    GreenHouseDTO dto = convertToDTO(greenhouse);
     writeToFile(dto, filePath);
   }
 
   /**
-   * Saves a greenhouse DTO to a JSON file.
-   *
-   * @param dto The greenhouse DTO to save
-   * @param filePath The file path where the JSON should be saved
-   * @throws IOException If an error occurs while writing to the file
-   */
-  public void saveGreenhouse(GreenHouseDTO dto, String filePath) throws IOException {
-    writeToFile(dto, filePath);
-  }
-
-  /**
-   * Converts a GreenHouse object and its components to a GreenHouseDTO.
+   * Converts a GreenHouse object to a GreenHouseDTO with complete state.
    *
    * @param greenhouse The greenhouse to convert
-   * @param sensors The list of sensors in the greenhouse
-   * @param appliances The list of appliances (actuators) in the greenhouse
-   * @return A GreenHouseDTO containing all the greenhouse data
+   * @return A GreenHouseDTO containing all greenhouse data including air and soil state
    */
-  private GreenHouseDTO convertToDTO(GreenHouse greenhouse, List<Sensor<?>> sensors, 
-                                      List<Actuator> appliances) {
+  private GreenHouseDTO convertToDTO(GreenHouse greenhouse) {
     GreenHouseDTO dto = new GreenHouseDTO();
     dto.setGreenHouseId(greenhouse.getID());
     
     // Convert sensors
     List<SensorDTO> sensorDTOs = new ArrayList<>();
-    for (Sensor<?> sensor : sensors) {
+    for (Sensor<?> sensor : greenhouse.getAllSensors()) {
       SensorDTO sensorDTO = new SensorDTO(
         sensor.getId(),
-        sensor.getType(),
-        sensor.isActive(),
-        sensor.isConnected()
+        sensor.getType()
       );
       sensorDTOs.add(sensorDTO);
     }
     dto.setSensors(sensorDTOs);
     
-    // Convert appliances (actuators)
+    // Convert appliances
     List<ApplianceDTO> applianceDTOs = new ArrayList<>();
-    for (Actuator appliance : appliances) {
+    for (Appliance appliance : greenhouse.getAllAppliances()) {
+      boolean powerState = false;
+      if (appliance instanceof AirAppliance) {
+        powerState = ((AirAppliance) appliance).getPowerState();
+      }
       ApplianceDTO applianceDTO = new ApplianceDTO(
         appliance.getId(),
         appliance.getType(),
-        appliance.getPowerState()
+        powerState
       );
       applianceDTOs.add(applianceDTO);
     }
     dto.setAppliances(applianceDTOs);
     
-    // Note: Air and Soil need to be accessed from the greenhouse
-    // This is a placeholder - you may need to add getters to GreenHouse class
-    // dto.setAir(convertAirToDTO(air));
-    // dto.setSoil(convertSoilToDTO(soil));
+    // Include air and soil state
+    dto.setAir(convertAirToDTO(greenhouse.getAir()));
+    dto.setSoil(convertSoilToDTO(greenhouse.getSoil()));
     
     return dto;
   }
@@ -138,6 +128,13 @@ public class JsonWriter {
    * @throws IOException If an error occurs while writing to the file
    */
   private void writeToFile(GreenHouseDTO dto, String filePath) throws IOException {
+    // Ensure the directory exists
+    File file = new File(filePath);
+    File parentDir = file.getParentFile();
+    if (parentDir != null && !parentDir.exists()) {
+      parentDir.mkdirs();
+    }
+    
     try (FileWriter writer = new FileWriter(filePath)) {
       gson.toJson(dto, writer);
     }
