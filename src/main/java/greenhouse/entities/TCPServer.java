@@ -6,6 +6,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import greenhouse.entities.appliances.*;
@@ -25,8 +27,8 @@ public class TCPServer extends ClockSubscriber {
   private final MenuSystem menuSystem;
   private static final String ENCRYPTION_ALGORITHM = "AES";
   private static final SecretKey SECRET_KEY = new SecretKeySpec(Base64.getDecoder().decode("m0VxcSPFs+2cuMUfh6tjWMj90eihSDGpc1cLr/B9e1Y="), ENCRYPTION_ALGORITHM);
-  private int greenHouseToListenTo = 0;
   private int activeMonitoringClients = 0;
+  private final Map<BufferedWriter, Integer> clientGreenhouseMap = new ConcurrentHashMap<>();
 
 
   /**
@@ -114,19 +116,19 @@ public class TCPServer extends ClockSubscriber {
   }
 
   /**
-   * Processes a client request.
-   * @param clientSocket The socket connection to the client.
-   * @param message The message received from the client.
-   * @param reader The BufferedReader used to read messages from the client.
-   * @param writer The BufferedWriter used to send responses back to the client.
-   * @throws IOException If an I/O error occurs while handling the command.
+   * Processes client requests and delegates to appropriate handlers based on the command.
+   *
+   * @param clientSocket The socket connection to the client
+   * @param message The message received from the client
+   * @param reader The BufferedReader used to read messages from the client
+   * @param writer The BufferedWriter used to send responses back to the client
+   * @throws IOException If an I/O error occurs while handling the command
    */
   private void handleClientRequest(Socket clientSocket, String message, BufferedReader reader, BufferedWriter writer) throws IOException{
     String command = message.toLowerCase().trim();
 
     switch (command) {
       case "greenhouses" -> menuSystem.handleGreenhousesMenu(reader, writer);
-      case "subscribe" -> handleSubscribe(clientSocket, writer);
       case "help" -> menuSystem.helpMessage(writer);
       default -> {
         writer.write(encryptMessage("Did not recognize command. Type 'help' for available commands."));
@@ -376,20 +378,6 @@ public class TCPServer extends ClockSubscriber {
     return result.toString().trim();
   }
 
-  private void handleSubscribe(Socket clientSocket, BufferedWriter writer) throws IOException {
-    boolean alreadySubscribed = subscribedClients.stream()
-            .anyMatch(cc -> cc.socket().equals(clientSocket));
-
-    if (!alreadySubscribed) {
-      addSubscriber(clientSocket, writer);
-      writer.write(encryptMessage("Subscribed successfully."));
-    } else {
-      writer.write(encryptMessage("Already subscribed."));
-    }
-    writer.newLine();
-    writer.flush();
-  }
-
 
   /**
    * Adds a subscriber to receive notifications from the server.
@@ -533,44 +521,65 @@ public class TCPServer extends ClockSubscriber {
    */
   @Override
   public void tick() {
-    notifySubscribers(greenHouses.get(greenHouseToListenTo).getAllSensorsInformation());
+    clientGreenhouseMap.entrySet().removeIf(entry -> {
+      try {
+        String sensorData = greenHouses.get(entry.getValue()).getAllSensorsInformation();
+        entry.getKey().write(encryptMessage(sensorData));
+        entry.getKey().newLine();
+        entry.getKey().flush();
+        return false; // Keep this client
+      } catch (IOException e) {
+        activeMonitoringClients--;
+        if (activeMonitoringClients == 0) {
+          stopListeningToGreenHouse();
+        }
+        return true; // Remove this client
+      }
+    });
   }
+
 
   /**
-   * Subscribes the server to the clock and sets the id of the
-   * greenhouse the client is listening to, to the given id.
+   * Subscribes a client to receive real-time greenhouse sensor updates.
+   * If this is the first client monitoring, subscribes the server to the Clock.
+   * Maps the client's writer to the specific greenhouse ID they are monitoring.
    *
-   * @param id The id of the greenhouse the client is listening to.
+   * @param gh The greenhouse the client wants to monitor
+   * @param writer The BufferedWriter used to send updates to the client
    */
-  public void startListeningToGreenhouse(int id) {
-    subscribe();
-    greenHouseToListenTo = id;
-  }
-
   public void subscribeClientToGreenhouseUpdates(GreenHouse gh, BufferedWriter writer) {
-    addSubscriber(null, writer);
+    clientGreenhouseMap.put(writer, gh.getID());
+
     if (activeMonitoringClients == 0) {
-      startListeningToGreenhouse(gh.getID());
+      subscribe();
     }
     activeMonitoringClients++;
   }
 
+  /**
+   * Unsubscribes a client from greenhouse sensor updates.
+   * Removes the client from the monitoring map and decrements the active monitoring counter.
+   * If this was the last monitoring client, unsubscribes the server from the Clock.
+   *
+   * @param writer The BufferedWriter of the client to unsubscribe
+   */
   public void unsubscribeClientFromGreenhouseUpdates(BufferedWriter writer) {
-    subscribedClients.removeIf(clientConnection -> clientConnection.writer().equals(writer));
+    Integer removed = clientGreenhouseMap.remove(writer);
 
-    activeMonitoringClients--;
-    if (activeMonitoringClients <= 0){
-      stopListeningToGreenHouse();
-      activeMonitoringClients = 0;
+    if (removed != null) {
+      activeMonitoringClients--;
+      if (activeMonitoringClients == 0) {
+        stopListeningToGreenHouse();
+      }
     }
   }
 
   /**
-   * Unsubscribes the server from the clock and sets the id of the
-   * greenhouse the client is listening to, to -1.
+   * Unsubscribes the TCPServer from the Clock's tick notifications.
+   * Called when the last client stops monitoring greenhouse sensors.
    */
   public void stopListeningToGreenHouse() {
-    Clock.getInstance().removeSubscriber(Clock.getInstance().getLastSubscriber());
+    Clock.getInstance().removeSubscriber(this);
   }
 
   /**
