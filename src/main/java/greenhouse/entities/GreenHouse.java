@@ -28,11 +28,19 @@ public class GreenHouse {
    *
    * @param greenHouseID The id of the green house.
    */
-  public GreenHouse(int greenHouseID) {
+  public GreenHouse(int greenHouseID) { // Used when creating greenhouse from scratch
     this.sensors = new ConcurrentHashMap<>();
     this.appliances = new ConcurrentHashMap<>();
     this.greenHouseID = greenHouseID;
     initiateAirAndSoil();
+  }
+
+  public GreenHouse(int greenHouseID, Soil soil, Air air) { // Used when creating greenhouse from JsonFile
+    this.sensors = new ConcurrentHashMap<>();
+    this.appliances = new ConcurrentHashMap<>();
+    this.greenHouseID = greenHouseID;
+    this.soil = soil;
+    this.air = air;
   }
 
   /**
