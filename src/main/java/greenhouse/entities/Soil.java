@@ -49,6 +49,7 @@ public class Soil extends ClockSubscriber implements Sensorable {
     else {
       soilMoisture += moistureChange;
     }
+    update();
   }
 
   /**
@@ -63,6 +64,7 @@ public class Soil extends ClockSubscriber implements Sensorable {
     else {
       nitrogen += nitrogenChange;
     }
+    update();
   }
 
   /**
@@ -80,6 +82,7 @@ public class Soil extends ClockSubscriber implements Sensorable {
     else {
       phValue += phChange;
     }
+    update();
   }
 
   /**
