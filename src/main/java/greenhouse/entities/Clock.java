@@ -14,9 +14,9 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class Clock {
-  private static int NORMAL = 10;
-  private static int MODERATE = 5;
-  private static int FAST = 5;
+  private static final int NORMAL = 10;
+  private static final int MODERATE = 5;
+  private static final int FAST = 1;
   private ArrayList<Integer> speeds = new ArrayList<>(Arrays.asList(NORMAL, MODERATE, FAST));
   private int position;
   private int currentRate;
