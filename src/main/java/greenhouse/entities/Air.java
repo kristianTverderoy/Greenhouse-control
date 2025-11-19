@@ -80,6 +80,7 @@ public class Air extends ClockSubscriber implements Sensorable {
     // Map sine wave from [-1, 1] to [30, 40,000] lux
     // Multiplied by random multiplier to simulate weather variations
     this.lux = randomMultiplier * (20015 + 19985 * sineValue);
+    update();
   }
 
   /**
@@ -112,6 +113,7 @@ public class Air extends ClockSubscriber implements Sensorable {
     } else {
       humidity -= humidityChange;
     }
+    update();
   }
 
   /**
@@ -151,7 +153,7 @@ public class Air extends ClockSubscriber implements Sensorable {
     } else {
       actualTemperature -= temperatureChange;
     }
-    
+    update();
   }
 
   /**
