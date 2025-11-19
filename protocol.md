@@ -34,10 +34,3 @@ The default port number for the server is `5000`.
 ## Error types
 
 ## Scenario
-
-## Handling network errors
-Network errors are printed out to the console for debugging purposes.
-
-## Security mechanisms
-The communication protocol incorporates encryption to 
-ensure data confidentiality and integrity.
