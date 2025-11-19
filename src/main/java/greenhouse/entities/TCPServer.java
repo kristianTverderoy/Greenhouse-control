@@ -671,62 +671,76 @@ public class TCPServer extends ClockSubscriber {
       for (GreenHouseDTO greenhouseDTO : greenhousesDTO) {
         AirDTO airDTO = greenhouseDTO.getAir();
         Air air = new Air(airDTO.getTargetTemperature(),
-                          airDTO.getTargetHumidity(),
-                          airDTO.getTargetLux());
+                airDTO.getTargetHumidity(),
+                airDTO.getTargetLux());
 
         SoilDTO soilDTO = greenhouseDTO.getSoil();
         Soil soil = new Soil(soilDTO.getSoilMoisture(),
-                            soilDTO.getPhValue(),
-                            soilDTO.getNitrogen()
-                            );
+                soilDTO.getPhValue(),
+                soilDTO.getNitrogen());
 
-        // Make greenhouse
-        GreenHouse greenHouse = new GreenHouse(greenhouseDTO.getGreenHouseId(),
-                                              soil,
-                                              air
-                                              );
+        int nextSensorId = greenhouseDTO.getNextSensorId();
+        int nextApplianceId = greenhouseDTO.getNextApplianceId();
+
+        // Create lists to hold sensors and appliances with their original IDs
+        List<Sensor<?>> sensorsToAdd = new CopyOnWriteArrayList<>();
+        List<Appliance> appliancesToAdd = new CopyOnWriteArrayList<>();
 
         List<SensorDTO> sensors = greenhouseDTO.getSensors();
         List<ApplianceDTO> appliances = greenhouseDTO.getAppliances();
 
-        for (SensorDTO sensorDTO : sensors) { //Add all sensors to the greenhouse
+        for (SensorDTO sensorDTO : sensors) {
           String sensorType = sensorDTO.getType().toLowerCase();
+          int sensorId = sensorDTO.getId();
+
           switch (sensorType) {
-            case "humidity", "humiditysensor" -> greenHouse.addHumiditySensor();
-            case "light", "lightsensor" -> greenHouse.addLightSensor();
-            case "ph", "phsensor" -> greenHouse.addPhSensor();
-            case "temperature", "temperaturesensor" -> greenHouse.addTemperatureSensor();
-            case "moisture", "moisturesensor" -> greenHouse.addMoistureSensor();
-            case "nitrogen", "nitrogensensor" -> greenHouse.addNitrogenSensor();
+            case "humidity", "humiditysensor" -> sensorsToAdd.add(new HumiditySensor(sensorId, air));
+            case "light", "lightsensor" -> sensorsToAdd.add(new LightSensor(sensorId, air));
+            case "ph", "phsensor" -> sensorsToAdd.add(new PHSensor(sensorId, soil));
+            case "temperature", "temperaturesensor" -> sensorsToAdd.add(new TemperatureSensor(sensorId, air));
+            case "moisture", "moisturesensor" -> sensorsToAdd.add(new MoistureSensor(sensorId, soil));
+            case "nitrogen", "nitrogensensor" -> sensorsToAdd.add(new NitrogenSensor(sensorId, soil));
             default -> System.err.println("Unknown sensor type: " + sensorType);
           }
         }
 
-        for (ApplianceDTO applianceDTO : appliances) { //Add all appliances to the greenhouse
+        for (ApplianceDTO applianceDTO : appliances) {
           String applianceType = applianceDTO.getType().toLowerCase();
+          int applianceId = applianceDTO.getId();
+
           switch (applianceType) {
-            case "aircondition", "airconditioner" -> greenHouse.addAppliance(
-                new Aircondition(greenHouse.getNextAvailableApplianceId()));
-            case "fertilizer" -> greenHouse.addAppliance(
-                new Fertilizer(greenHouse.getNextAvailableApplianceId()));
-            case "humidifier" -> greenHouse.addAppliance(
-                new Humidifier(greenHouse.getNextAvailableApplianceId()));
-            case "lamp", "light" -> greenHouse.addAppliance(
-                new Lamp(greenHouse.getNextAvailableApplianceId()));
-            case "limer", "lime" -> greenHouse.addAppliance(
-                new Limer(greenHouse.getNextAvailableApplianceId()));
-            case "sprinkler" -> greenHouse.addAppliance(
-                new Sprinkler(greenHouse.getNextAvailableApplianceId()));
+            case "aircondition" -> appliancesToAdd.add(new Aircondition(applianceId));
+            case "lamp" -> appliancesToAdd.add(new Lamp(applianceId));
+            case "humidifier" -> appliancesToAdd.add(new Humidifier(applianceId));
+            case "sprinkler" -> {
+              Sprinkler sprinkler = new Sprinkler(applianceId);
+              sprinkler.addSoil(soil);
+              appliancesToAdd.add(sprinkler);
+            }
+            case "fertilizer" -> {
+              Fertilizer fertilizer = new Fertilizer(applianceId);
+              fertilizer.addSoil(soil);
+              appliancesToAdd.add(fertilizer);
+            }
+            case "limer" -> {
+              Limer limer = new Limer(applianceId);
+              limer.addSoil(soil);
+              appliancesToAdd.add(limer);
+            }
             default -> System.err.println("Unknown appliance type: " + applianceType);
           }
         }
 
+        // Create greenhouse with pre-populated lists
+        GreenHouse greenHouse = new GreenHouse(greenhouseDTO.getGreenHouseId(),
+                soil, air, nextSensorId, nextApplianceId,
+                sensorsToAdd, appliancesToAdd);
+
         this.greenHouses.add(greenHouse);
       }
 
-
     } catch (IOException e) {
-      //No greenhouses
+      // Handle exception
     }
   }
 
