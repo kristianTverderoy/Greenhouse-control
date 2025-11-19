@@ -3,15 +3,29 @@ package greenhouse.entities.sensors;
 import greenhouse.entities.Air;
 import greenhouse.entities.AirSubscriber;
 
+/**
+ * Represents a sensor which measures the temperature of air.
+ *
+ * @param <T>
+ */
 public class TemperatureSensor<T> extends Sensor<T> implements AirSubscriber {
-
   private double latestTemperatureReading;
 
+  /**
+   * Creates an instance of the TemperatureSensor.
+   *
+   * @param id The id of the temperature sensor.
+   * @param air The air which the sensor measures the temperature of.
+   */
   public TemperatureSensor(int id,Air air) {
     super("TemperatureSensor", id);
     update(air);
   }
 
+  /**
+   * Subscribes the
+   * @param air The air the subscriber subscribes to.
+   */
   @Override
   public void subscribe(Air air) {
     air.addSubscriber(this);
