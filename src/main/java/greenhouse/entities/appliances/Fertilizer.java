@@ -9,6 +9,6 @@ public class Fertilizer extends SoilAppliance {
 
   @Override
   public void actuate() {
-    super.getSoil().useFertilizer();
+    super.getSoil().fertilize(10);
   }
 }
