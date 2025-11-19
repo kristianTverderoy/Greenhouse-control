@@ -183,6 +183,22 @@ public class GreenHouse {
   }
 
   /**
+   * Removes the sensor with the given id.
+   * @param sensorId The id of the sensor being removed.
+   */
+  public void removeSensor(int sensorId) {
+    sensors.remove(sensorId);
+  }
+
+  /**
+   * Removes the appliance with the given id.
+   * @param applianceId The id of the appliance being removed.
+   */
+  public void removeAppliance(int applianceId) {
+    appliances.remove(applianceId);
+  }
+
+  /**
    * Activates the appliance with the given id.
    *
    * @param id The id of the appliance being activated.
