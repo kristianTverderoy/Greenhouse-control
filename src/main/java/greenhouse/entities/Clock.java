@@ -14,16 +14,15 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class Clock {
-  private static int NORMAL = 10;
-  private static int MODERATE = 5;
-  private static int FAST = 1;
+  private static final int NORMAL = 10;
+  private static final int MODERATE = 5;
+  private static final int FAST = 1;
   private ArrayList<Integer> speeds = new ArrayList<>(Arrays.asList(NORMAL, MODERATE, FAST));
   private int position;
   private int currentRate;
 
   private ScheduledExecutorService scheduler;
   private boolean on;
-
   private static Clock clock = null;
   private ArrayList<ClockSubscriber> subscribers;
 
@@ -40,7 +39,7 @@ public class Clock {
    */
   public void start() {
     scheduler = Executors.newScheduledThreadPool(1);
-    scheduler.scheduleAtFixedRate(tick(), 0, NORMAL, TimeUnit.MINUTES);
+    scheduler.scheduleAtFixedRate(tick(), 0, NORMAL, TimeUnit.SECONDS);
     position = 0;
     currentRate = NORMAL;
     on = true;
@@ -152,5 +151,24 @@ public class Clock {
    */
   public void subscribe(ClockSubscriber subscriber) {
     subscribers.add(subscriber);
+  }
+
+  /**
+   * Removes the subscriber with the given subscriber id.
+   *
+   * @param subscriber the ClockSubscriber to remove from the list of subscribers.
+   */
+  public void removeSubscriber(ClockSubscriber subscriber) {
+    subscribers.remove(subscriber);
+  }
+
+  /**
+   * Returns the id of the last subscriber in the clock's list
+   * of subscribers.
+   *
+   * @return The id of the last subscriber in the clock's list of subscribers.
+   */
+  public int getLastSubscriber() {
+    return subscribers.size() - 1;
   }
 }

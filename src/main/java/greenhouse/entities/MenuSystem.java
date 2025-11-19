@@ -54,7 +54,7 @@ public class MenuSystem {
   public void showStartMenu(BufferedWriter writer) throws IOException {
     writer.write(server.encryptMessage("\nMenu:"));
     writer.newLine();
-    writer.write(server.encryptMessage("Commands: greenhouses | saveserverstate | newgreenhouse | help | exit"));
+    writer.write(server.encryptMessage("Commands: greenhouses | saveserverstate | help | exit"));
     writer.newLine();
     writer.flush();
   }
@@ -164,7 +164,7 @@ public class MenuSystem {
         writer.write(server.encryptMessage("\nGreenhouse " + id));
         writer.newLine();
         writer.write(server.encryptMessage("Commands: 'help' | 'addsensor' | 'sensorreading' | "
-                + "'addappliance' | 'appliance' | 'back'"));
+                + "'addappliance' | 'appliance' | 'monitor' | 'newtemptarget' | 'newhumiditytarget' | 'back'"));
         writer.newLine();
         writer.flush();
         hasShownMenu = true;
@@ -178,6 +178,9 @@ public class MenuSystem {
       if (input.startsWith("addsensor")) {
         try {
           server.addSensorsToGreenhouse(input + " -" + id);
+          writer.write(server.encryptMessage("Sensor(s) added successfully."));
+          writer.newLine();
+          writer.flush();
         } catch (SensorNotAddedToGreenHouseException | IOException e) {
           writer.write(server.encryptMessage("Could not add sensor. Try 'man -addsensor' for help."));
           writer.newLine();
@@ -187,9 +190,47 @@ public class MenuSystem {
           writer.newLine();
           writer.flush();
         }
+      } else if (input.startsWith("removeappliance")) {
+        try {
+          server.removeApplianceFromGreenhouse(input + " -" + id);
+          writer.write(server.encryptMessage("Appliance removed successfully."));
+          writer.newLine();
+          writer.flush();
+        } catch (IOException e) {
+          writer.write(server.encryptMessage("Could not remove appliance. Try 'man -removeappliance' for help."));
+          writer.newLine();
+          writer.flush();
+        } catch (NoExistingGreenHouseException e) {
+          writer.write(server.encryptMessage("Could not find greenhouse to remove appliance from."));
+          writer.newLine();
+          writer.flush();
+        } catch (IllegalArgumentException e) {
+          writer.write(server.encryptMessage("Invalid appliance ID provided for removal. Try 'man -removeappliance' for help."));
+          writer.newLine();
+          writer.flush();
+        }
+      } else if (input.startsWith("removesensor")) {
+        try {
+          server.removeSensorFromGreenhouse(input + " -" + id);
+          writer.write(server.encryptMessage("Sensor removed successfully."));
+          writer.newLine();
+          writer.flush();
+        } catch (IOException e) {
+          writer.write(server.encryptMessage("Could not remove sensor. Try 'man -removesensor' for help."));
+          writer.newLine();
+          writer.flush();
+        } catch (NoExistingGreenHouseException e) {
+          writer.write(server.encryptMessage("Could not find greenhouse to remove sensor from."));
+          writer.newLine();
+          writer.flush();
+        } catch (IllegalArgumentException e) {
+          writer.write(server.encryptMessage("Invalid sensor ID provided for removal. Try 'man -removesensor' for help."));
+          writer.newLine();
+          writer.flush();
+        }
       } else if (input.startsWith("sensorreading")) {
         try {
-          writer.write(server.handleSensorReadingRequest(input + " -" + id));
+          writer.write(server.encryptMessage(server.handleSensorReadingRequest(input + " -" + id)));
           writer.newLine();
           writer.flush();
         } catch (IOException e) {
@@ -245,7 +286,7 @@ public class MenuSystem {
           writer.newLine();
           writer.flush();
         } catch (IOException e) {
-          writer.write(server.encryptMessage("Could not process appliance toggle request."));
+          writer.write(server.encryptMessage("Could not process appliance toggle request. Try 'man -toggleappliance' for help."));
           writer.newLine();
           writer.flush();
         } catch (NoExistingGreenHouseException e) {
@@ -257,7 +298,44 @@ public class MenuSystem {
           writer.newLine();
           writer.flush();
         }
-      } else if (input.startsWith("man")) {
+} else if (input.startsWith("newtemptarget")) {
+        try {
+          server.updateGreenhouseTempTarget(input + " -" + id);
+          writer.write(server.encryptMessage("Temperature target updated successfully."));
+          writer.newLine();
+          writer.flush();
+        } catch (IOException e) {
+          writer.write(server.encryptMessage("Could not process new temperature target request."));
+          writer.newLine();
+          writer.flush();
+        } catch (NoExistingGreenHouseException e) {
+          writer.write(server.encryptMessage("Could not find greenhouse to set temperature target in."));
+          writer.newLine();
+          writer.flush();
+        } catch (IllegalArgumentException e) {
+          writer.write(server.encryptMessage("Invalid temperature target provided. Try man -newtemptarget' for help."));
+          writer.newLine();
+          writer.flush();
+        }
+      } else if (input.startsWith("newhumiditytarget")) {
+        try {
+          server.updateGreenhouseHumidityTarget(input + " -" + id);
+          writer.write(server.encryptMessage("Humidity target updated successfully."));
+          writer.newLine();
+          writer.flush();
+        } catch (IOException e) {
+          writer.write(server.encryptMessage("Could not process new humidity target request."));
+          writer.newLine();
+          writer.flush();
+        } catch (NoExistingGreenHouseException e) {
+          writer.write(server.encryptMessage("Could not find greenhouse to set humidity target in."));
+          writer.newLine();
+          writer.flush();
+        } catch (IllegalArgumentException e) {
+          writer.write(server.encryptMessage("Invalid humidity target provided. Try man -newhumiditytarget' for help."));
+          writer.newLine();
+          writer.flush();
+        }      }else if (input.startsWith("man")) {
         String manualResponse = CommandProcessor.handleManualRequest(input);
         writer.write(server.encryptMessage(manualResponse));
         writer.newLine();
@@ -270,11 +348,23 @@ public class MenuSystem {
           writer.newLine();
           writer.write(server.encryptMessage("'addsensor' For further info, use 'man -addsensor'."));
           writer.newLine();
-          writer.write(server.encryptMessage("'sensorreading' For further info, use 'man -sensorreading'."));
-          writer.newLine();
           writer.write(server.encryptMessage("'addappliance' For further info, use 'man -addappliance'."));
           writer.newLine();
+          writer.write(server.encryptMessage("'removesensor' For further info use 'man -removesensor'."));
+          writer.newLine();
+          writer.write(server.encryptMessage("'removeappliance' For further info use 'man -removeappliance'."));
+          writer.newLine();
+          writer.write(server.encryptMessage("'sensorreading' For further info, use 'man -sensorreading'."));
+          writer.newLine();
+          writer.write(server.encryptMessage("'appliancereading' For further info, use 'man -appliancereading'."));
+          writer.newLine();
           writer.write(server.encryptMessage("'toggleappliance' For further info, use 'man -toggleappliance'."));
+          writer.newLine();
+          writer.write(server.encryptMessage("'newtemptarget' For further info, use 'man -newtemptarget'."));
+          writer.newLine();
+          writer.write(server.encryptMessage("'newhumiditytarget' For further info, use 'man -newhumiditytarget'."));
+          writer.newLine();
+          writer.write(server.encryptMessage("'monitor' - Start monitoring all sensors data in real-time."));
           writer.newLine();
           writer.write(server.encryptMessage("'help' - Show help message."));
           writer.newLine();
@@ -285,7 +375,37 @@ public class MenuSystem {
         case "back" -> {
           return;
         }
+
+        case "monitor" -> handleGreenhouseSensorMonitoring(gh, writer, reader);
+
       }
+    }
+  }
+
+  private void handleGreenhouseSensorMonitoring(GreenHouse gh, BufferedWriter writer, BufferedReader reader) throws IOException {
+    writer.write(server.encryptMessage("Sensor monitoring started for Greenhouse " + gh.getID()));
+    writer.newLine();
+    writer.write(server.encryptMessage("Type 'stop' to stop monitoring."));
+    writer.newLine();
+    writer.flush();
+
+    server.subscribeClientToGreenhouseUpdates(gh, writer);
+
+    try {
+      while (server.isOn()) {
+        String input = server.decryptMessage(reader.readLine());
+        if (input == null) {
+          break;
+        }
+        if (input.toLowerCase().trim().equals("stop") || input.toLowerCase().trim().equals("back")) {
+          writer.write(server.encryptMessage("Sensor monitoring stopped."));
+          writer.newLine();
+          writer.flush();
+          break;
+        }
+      }
+    } finally {
+      server.unsubscribeClientFromGreenhouseUpdates(writer);
     }
   }
 

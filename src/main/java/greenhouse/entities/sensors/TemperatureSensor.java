@@ -23,14 +23,21 @@ public class TemperatureSensor<T> extends Sensor<T> implements AirSubscriber {
   }
 
   /**
-   * Subscribes the
-   * @param air The air the subscriber subscribes to.
+   * Subscribes the temperature sensor to the given air.
+   *
+   * @param air The air the sensor measures the temperature of.
    */
   @Override
   public void subscribe(Air air) {
     air.addSubscriber(this);
   }
 
+  /**
+   * Alerts the sensor that the tempersture of the given air has been changed,
+   * and updates the latest temperature reading to match the new temperature.
+   *
+   * @param air The air whose temperature has just been changed.
+   */
   @Override
   public void update(Air air) {
     this.latestTemperatureReading = air.getTemperature();
@@ -44,7 +51,4 @@ public class TemperatureSensor<T> extends Sensor<T> implements AirSubscriber {
             '}';
   }
 
-  public double getTemperature() {
-    return latestTemperatureReading;
-  }
 }

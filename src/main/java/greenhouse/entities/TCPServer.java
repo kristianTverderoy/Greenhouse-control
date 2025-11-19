@@ -6,6 +6,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import greenhouse.entities.appliances.*;
@@ -23,7 +25,7 @@ import greenhouse.entities.filehandling.SoilDTO;
 import greenhouse.entities.filehandling.AirDTO;
 import greenhouse.entities.filehandling.ApplianceDTO;
 
-public class TCPServer {
+public class TCPServer extends ClockSubscriber {
 
   private final int port;
   private final List<ClientConnection> subscribedClients = new CopyOnWriteArrayList<>();
@@ -33,6 +35,8 @@ public class TCPServer {
   private final MenuSystem menuSystem;
   private static final String ENCRYPTION_ALGORITHM = "AES";
   private static final SecretKey SECRET_KEY = new SecretKeySpec(Base64.getDecoder().decode("m0VxcSPFs+2cuMUfh6tjWMj90eihSDGpc1cLr/B9e1Y="), ENCRYPTION_ALGORITHM);
+  private int activeMonitoringClients = 0;
+  private final Map<BufferedWriter, Integer> clientGreenhouseMap = new ConcurrentHashMap<>();
 
 
   /**
@@ -121,19 +125,19 @@ public class TCPServer {
   }
 
   /**
-   * Processes a client request.
-   * @param clientSocket The socket connection to the client.
-   * @param message The message received from the client.
-   * @param reader The BufferedReader used to read messages from the client.
-   * @param writer The BufferedWriter used to send responses back to the client.
-   * @throws IOException If an I/O error occurs while handling the command.
+   * Processes client requests and delegates to appropriate handlers based on the command.
+   *
+   * @param clientSocket The socket connection to the client
+   * @param message The message received from the client
+   * @param reader The BufferedReader used to read messages from the client
+   * @param writer The BufferedWriter used to send responses back to the client
+   * @throws IOException If an I/O error occurs while handling the command
    */
   private void handleClientRequest(Socket clientSocket, String message, BufferedReader reader, BufferedWriter writer) throws IOException{
     String command = message.toLowerCase().trim();
 
     switch (command) {
       case "greenhouses" -> menuSystem.handleGreenhousesMenu(reader, writer);
-      case "subscribe" -> handleSubscribe(clientSocket, writer);
       case "saveserverstate" -> {
         try {
           saveAllGreenHouses();
@@ -334,6 +338,129 @@ public class TCPServer {
     }
   }
 
+  /**
+   * Updates the air temperature target of a specified greenhouse.
+   * @param greenhouseAndTempTargetValue the command string in the format: "updateTempTarget -<temperatureTarget> -<greenhouseId>"
+   * @throws NoExistingGreenHouseException if there are no existing greenhouses in the list
+   */
+  public void updateGreenhouseTempTarget(String greenhouseAndTempTargetValue) throws NoExistingGreenHouseException, IOException, IllegalArgumentException {
+    if (greenHouses.isEmpty()) {
+      throw new NoExistingGreenHouseException();
+    }
+      try {
+        String[] parts = greenhouseAndTempTargetValue.split("-");
+        double temperatureTarget = Double.parseDouble(parts[1]);
+        int greenhouseId = Integer.parseInt(parts[2].trim());
+
+        GreenHouse targetGreenhouse = greenHouses.stream()
+                .filter(gh -> gh.getID() == greenhouseId)
+                .findFirst()
+                .orElseThrow(NoExistingGreenHouseException::new);
+
+        targetGreenhouse.updateAirTemperatureTarget(temperatureTarget);
+      } catch (NumberFormatException e) {
+        throw new IllegalArgumentException("Invalid temperature target format.");
+      } catch (ArrayIndexOutOfBoundsException e) {
+        throw new IOException("The user did not follow the example for input");
+    }
+  }
+
+  /**
+   * Updates the air humidity target of a specified greenhouse.
+   * @param message the command string in the format: "updateHumidityTarget -<humidityTarget> -<greenhouseId>"
+   * @throws NoExistingGreenHouseException if there are no existing greenhouses in the list
+   * @throws IOException if the message format is incorrect
+   * @throws IllegalArgumentException if the humidity value format is invalid
+   */
+  public void updateGreenhouseHumidityTarget(String message) throws NoExistingGreenHouseException, IOException, IllegalArgumentException {
+    if (greenHouses.isEmpty()) {
+      throw new NoExistingGreenHouseException();
+    }
+    try {
+      String[] parts = message.split("-");
+      float humidityTarget = Float.parseFloat(parts[1].trim());
+      int greenhouseId = Integer.parseInt(parts[2].trim());
+
+      GreenHouse targetGreenhouse = greenHouses.stream()
+              .filter(gh -> gh.getID() == greenhouseId)
+              .findFirst()
+              .orElseThrow(NoExistingGreenHouseException::new);
+
+      targetGreenhouse.updateAirHumidityTarget(humidityTarget);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Invalid humidity target format.");
+    } catch (ArrayIndexOutOfBoundsException e) {
+      throw new IOException("The user did not follow the example for input");
+    }
+  }
+
+  /**
+   * Removes a sensor from a specified greenhouse.
+   * @param message the command string in the format: "removesensor -<sensorId> -<greenhouseId>"
+   * @throws NoExistingGreenHouseException if there are no existing greenhouses in the list
+   * @throws IOException if the message format is incorrect
+   * @throws IllegalArgumentException if the sensor ID is invalid or sensor not found
+   */
+  public void removeSensorFromGreenhouse(String message) throws NoExistingGreenHouseException, IOException, IllegalArgumentException {
+    if (greenHouses.isEmpty()) {
+      throw new NoExistingGreenHouseException();
+    }
+    try {
+      String[] parts = message.split("-");
+      int sensorId = Integer.parseInt(parts[1].trim());
+      int greenhouseId = Integer.parseInt(parts[2].trim());
+
+      GreenHouse targetGreenhouse = greenHouses.stream()
+              .filter(gh -> gh.getID() == greenhouseId)
+              .findFirst()
+              .orElseThrow(NoExistingGreenHouseException::new);
+
+      if (targetGreenhouse.getSensor(sensorId) == null) {
+        throw new IllegalArgumentException("Sensor not found with ID: " + sensorId);
+      }
+
+      targetGreenhouse.removeSensor(sensorId);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Invalid sensor ID format.");
+    } catch (ArrayIndexOutOfBoundsException e) {
+      throw new IOException("The user did not follow the example for input");
+    }
+  }
+
+  /**
+   * Removes an appliance from a specified greenhouse.
+   * @param message the command string in the format: "removeappliance -<applianceId> -<greenhouseId>"
+   * @throws NoExistingGreenHouseException if there are no existing greenhouses in the list
+   * @throws IOException if the message format is incorrect
+   * @throws IllegalArgumentException if the appliance ID is invalid or appliance not found
+   */
+  public void removeApplianceFromGreenhouse(String message) throws NoExistingGreenHouseException, IOException, IllegalArgumentException {
+    if (greenHouses.isEmpty()) {
+      throw new NoExistingGreenHouseException();
+    }
+    try {
+      String[] parts = message.split("-");
+      int applianceId = Integer.parseInt(parts[1].trim());
+      int greenhouseId = Integer.parseInt(parts[2].trim());
+
+      GreenHouse targetGreenhouse = greenHouses.stream()
+              .filter(gh -> gh.getID() == greenhouseId)
+              .findFirst()
+              .orElseThrow(NoExistingGreenHouseException::new);
+
+      if (targetGreenhouse.getAppliance(applianceId) == null) {
+        throw new IllegalArgumentException("Appliance not found with ID: " + applianceId);
+      }
+
+      targetGreenhouse.removeAppliance(applianceId);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Invalid appliance ID format.");
+    } catch (ArrayIndexOutOfBoundsException e) {
+      throw new IOException("The user did not follow the example for input");
+    }
+  }
+
+
   public void addAppliancesToGreenhouse(String message) throws ApplianceNotAddedToGreenHouseException, NoExistingGreenHouseException, IOException {
     if (greenHouses.isEmpty()){
       throw new NoExistingGreenHouseException();
@@ -389,20 +516,6 @@ public class TCPServer {
       result.append("Greenhouse ").append(greenHouse.getID()).append(", ");
     }
     return result.toString().trim();
-  }
-
-  private void handleSubscribe(Socket clientSocket, BufferedWriter writer) throws IOException {
-    boolean alreadySubscribed = subscribedClients.stream()
-            .anyMatch(cc -> cc.socket().equals(clientSocket));
-
-    if (!alreadySubscribed) {
-      addSubscriber(clientSocket, writer);
-      writer.write(encryptMessage("Subscribed successfully."));
-    } else {
-      writer.write(encryptMessage("Already subscribed."));
-    }
-    writer.newLine();
-    writer.flush();
   }
 
 
@@ -558,65 +671,145 @@ public class TCPServer {
       for (GreenHouseDTO greenhouseDTO : greenhousesDTO) {
         AirDTO airDTO = greenhouseDTO.getAir();
         Air air = new Air(airDTO.getTargetTemperature(),
-                          airDTO.getTargetHumidity(),
-                          airDTO.getTargetLux());
+                airDTO.getTargetHumidity(),
+                airDTO.getTargetLux());
 
         SoilDTO soilDTO = greenhouseDTO.getSoil();
         Soil soil = new Soil(soilDTO.getSoilMoisture(),
-                            soilDTO.getPhValue(),
-                            soilDTO.getNitrogen()
-                            );
-        
-        // Make greenhouse
-        GreenHouse greenHouse = new GreenHouse(greenhouseDTO.getGreenHouseId(),
-                                              soil,
-                                              air
-                                              );
-        
+                soilDTO.getPhValue(),
+                soilDTO.getNitrogen());
+
+        int nextSensorId = greenhouseDTO.getNextSensorId();
+        int nextApplianceId = greenhouseDTO.getNextApplianceId();
+
+        // Create lists to hold sensors and appliances with their original IDs
+        List<Sensor<?>> sensorsToAdd = new CopyOnWriteArrayList<>();
+        List<Appliance> appliancesToAdd = new CopyOnWriteArrayList<>();
+
         List<SensorDTO> sensors = greenhouseDTO.getSensors();
         List<ApplianceDTO> appliances = greenhouseDTO.getAppliances();
 
-        for (SensorDTO sensorDTO : sensors) { //Add all sensors to the greenhouse
+        for (SensorDTO sensorDTO : sensors) {
           String sensorType = sensorDTO.getType().toLowerCase();
+          int sensorId = sensorDTO.getId();
+
           switch (sensorType) {
-            case "humidity", "humiditysensor" -> greenHouse.addHumiditySensor();
-            case "light", "lightsensor" -> greenHouse.addLightSensor();
-            case "ph", "phsensor" -> greenHouse.addPhSensor();
-            case "temperature", "temperaturesensor" -> greenHouse.addTemperatureSensor();
-            case "moisture", "moisturesensor" -> greenHouse.addMoistureSensor();
-            case "nitrogen", "nitrogensensor" -> greenHouse.addNitrogenSensor();
+            case "humidity", "humiditysensor" -> sensorsToAdd.add(new HumiditySensor(sensorId, air));
+            case "light", "lightsensor" -> sensorsToAdd.add(new LightSensor(sensorId, air));
+            case "ph", "phsensor" -> sensorsToAdd.add(new PHSensor(sensorId, soil));
+            case "temperature", "temperaturesensor" -> sensorsToAdd.add(new TemperatureSensor(sensorId, air));
+            case "moisture", "moisturesensor" -> sensorsToAdd.add(new MoistureSensor(sensorId, soil));
+            case "nitrogen", "nitrogensensor" -> sensorsToAdd.add(new NitrogenSensor(sensorId, soil));
             default -> System.err.println("Unknown sensor type: " + sensorType);
           }
         }
 
-        for (ApplianceDTO applianceDTO : appliances) { //Add all appliances to the greenhouse
+        for (ApplianceDTO applianceDTO : appliances) {
           String applianceType = applianceDTO.getType().toLowerCase();
+          int applianceId = applianceDTO.getId();
+
           switch (applianceType) {
-            case "aircondition", "airconditioner" -> greenHouse.addAppliance(
-                new Aircondition(greenHouse.getNextAvailableApplianceId()));
-            case "fertilizer" -> greenHouse.addAppliance(
-                new Fertilizer(greenHouse.getNextAvailableApplianceId()));
-            case "humidifier" -> greenHouse.addAppliance(
-                new Humidifier(greenHouse.getNextAvailableApplianceId()));
-            case "lamp", "light" -> greenHouse.addAppliance(
-                new Lamp(greenHouse.getNextAvailableApplianceId()));
-            case "limer", "lime" -> greenHouse.addAppliance(
-                new Limer(greenHouse.getNextAvailableApplianceId()));
-            case "sprinkler" -> greenHouse.addAppliance(
-                new Sprinkler(greenHouse.getNextAvailableApplianceId()));
+            case "aircondition" -> appliancesToAdd.add(new Aircondition(applianceId));
+            case "lamp" -> appliancesToAdd.add(new Lamp(applianceId));
+            case "humidifier" -> appliancesToAdd.add(new Humidifier(applianceId));
+            case "sprinkler" -> {
+              Sprinkler sprinkler = new Sprinkler(applianceId);
+              sprinkler.addSoil(soil);
+              appliancesToAdd.add(sprinkler);
+            }
+            case "fertilizer" -> {
+              Fertilizer fertilizer = new Fertilizer(applianceId);
+              fertilizer.addSoil(soil);
+              appliancesToAdd.add(fertilizer);
+            }
+            case "limer" -> {
+              Limer limer = new Limer(applianceId);
+              limer.addSoil(soil);
+              appliancesToAdd.add(limer);
+            }
             default -> System.err.println("Unknown appliance type: " + applianceType);
           }
         }
 
+        // Create greenhouse with pre-populated lists
+        GreenHouse greenHouse = new GreenHouse(greenhouseDTO.getGreenHouseId(),
+                soil, air, nextSensorId, nextApplianceId,
+                sensorsToAdd, appliancesToAdd);
+
         this.greenHouses.add(greenHouse);
       }
 
-
     } catch (IOException e) {
-      //No greenhouses
+      // Handle exception
     }
   }
 
+  /**
+   * Sends all sensor information of the greenhouse the client is listening to,
+   * to the client.
+   */
+  @Override
+  public void tick() {
+    clientGreenhouseMap.entrySet().removeIf(entry -> {
+      try {
+        String sensorData = greenHouses.get(entry.getValue()).getAllSensorsInformation();
+        entry.getKey().write(encryptMessage(sensorData));
+        entry.getKey().newLine();
+        entry.getKey().flush();
+        return false; // Keep this client
+      } catch (IOException e) {
+        activeMonitoringClients--;
+        if (activeMonitoringClients == 0) {
+          stopListeningToGreenHouse();
+        }
+        return true; // Remove this client
+      }
+    });
+  }
+
+
+  /**
+   * Subscribes a client to receive real-time greenhouse sensor updates.
+   * If this is the first client monitoring, subscribes the server to the Clock.
+   * Maps the client's writer to the specific greenhouse ID they are monitoring.
+   *
+   * @param gh The greenhouse the client wants to monitor
+   * @param writer The BufferedWriter used to send updates to the client
+   */
+  public void subscribeClientToGreenhouseUpdates(GreenHouse gh, BufferedWriter writer) {
+    clientGreenhouseMap.put(writer, gh.getID());
+
+    if (activeMonitoringClients == 0) {
+      subscribe();
+    }
+    activeMonitoringClients++;
+  }
+
+  /**
+   * Unsubscribes a client from greenhouse sensor updates.
+   * Removes the client from the monitoring map and decrements the active monitoring counter.
+   * If this was the last monitoring client, unsubscribes the server from the Clock.
+   *
+   * @param writer The BufferedWriter of the client to unsubscribe
+   */
+  public void unsubscribeClientFromGreenhouseUpdates(BufferedWriter writer) {
+    Integer removed = clientGreenhouseMap.remove(writer);
+
+    if (removed != null) {
+      activeMonitoringClients--;
+      if (activeMonitoringClients == 0) {
+        stopListeningToGreenHouse();
+      }
+    }
+  }
+
+  /**
+   * Unsubscribes the TCPServer from the Clock's tick notifications.
+   * Called when the last client stops monitoring greenhouse sensors.
+   */
+  public void stopListeningToGreenHouse() {
+    Clock.getInstance().removeSubscriber(this);
+  }
 
   /**
    * Record holding information about a client connection.
@@ -642,7 +835,11 @@ public class TCPServer {
     public BufferedWriter writer() {
       return writer;
     }
+
+
   }
+
+
 
 
 }

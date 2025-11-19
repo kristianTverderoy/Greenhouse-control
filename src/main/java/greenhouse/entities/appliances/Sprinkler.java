@@ -16,6 +16,9 @@ public class Sprinkler extends SoilAppliance {
     super("Sprinkler", id);
   }
 
+  /**
+   * Sprinkles the soil with water.
+   */
   @Override
   public void actuate() {
     super.getSoil().waterSoil(20);

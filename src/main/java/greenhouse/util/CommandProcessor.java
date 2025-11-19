@@ -52,6 +52,27 @@ public class CommandProcessor {
                 + "Example: 'appliancereading -3' will return the status of the appliance with the id 3 \n"
                 + "Likewise, 'appliancereading -a' will read all appliances in the greenhouse you're in the menu of.";
 
+        case "newtemptarget" -> "To set a new target temperature for the greenhouse, use the command: "
+                + "newtemptarget -<temperature>.\n"
+                + "Where <temperature> is the new target temperature you want to set (e.g 22.5), \n "
+                + "Example: 'newtemptarget -21.5' will set the target temperature of the greenhouse"
+                + " you're in the menu of to 21.5 degrees Celsius.";
+
+        case "newhumiditytarget" -> "To set a new target humidity for the greenhouse, use the command: "
+                + "newhumiditytarget -<humidity>.\n"
+                + "Where <humidity> is the new target humidity you want to set (e.g 0.65), \n "
+                + "Example: 'newhumiditytarget -0.70' will set the target humidity of the greenhouse"
+                + " you're in the menu of to 70%.";
+
+        case "removesensor" -> "To remove a sensor from the greenhouse, use the command: "
+                + "removesensor -<id>. \n"
+                + "Where <id> is the id of the sensor you want to remove from the greenhouse you're in. \n"
+                + "Example: 'removesensor -1' will remove the sensor with the id 1, from the greenhouse you're in the menu of.";
+
+        case "removeappliance" -> "To remove an appliance from the greenhouse, use the command: "
+                + "removeappliance -<id>. \n"
+                + "Where <id> is the id of the appliance you want to remove from the greenhouse you're in. \n"
+                + "Example: 'removesensor -3' will remove the sensor with the id 3, from the greenhouse you're in";
 
         default -> "Did not find that item in 'man'.";
       };

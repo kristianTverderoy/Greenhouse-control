@@ -8,18 +8,22 @@ public class GreenHouseDTO {
   private List<ApplianceDTO> appliances;
   private AirDTO air;
   private SoilDTO soil;
+  private int nextSensorId;
+  private int nextApplianceId;
 
   public GreenHouseDTO() {
     
   }
 
   public GreenHouseDTO(int greenHouseId, List<SensorDTO> sensors, List<ApplianceDTO> appliances, 
-                       AirDTO air, SoilDTO soil) {
+                       AirDTO air, SoilDTO soil, int nextSensorId, int nextApplianceId) {
     this.greenHouseId = greenHouseId;
     this.sensors = sensors;
     this.appliances = appliances;
     this.air = air;
     this.soil = soil;
+    this.nextSensorId = nextSensorId;
+    this.nextApplianceId = nextApplianceId;
   }
 
   public int getGreenHouseId() {
@@ -60,5 +64,21 @@ public class GreenHouseDTO {
 
   public void setSoil(SoilDTO soil) {
     this.soil = soil;
+  }
+
+  public void setNextApplianceId(int nextApplianceId) {
+    this.nextApplianceId = nextApplianceId;
+  }
+
+  public void setNextSensorId(int nextSensorId) {
+    this.nextSensorId = nextSensorId;
+  }
+
+  public int getNextApplianceId() {
+    return nextApplianceId;
+  }
+
+  public int getNextSensorId() {
+    return nextSensorId;
   }
 }

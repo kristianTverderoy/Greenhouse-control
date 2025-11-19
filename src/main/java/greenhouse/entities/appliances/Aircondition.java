@@ -74,6 +74,9 @@ public class Aircondition extends AirAppliance {
     }
   }
 
+  /**
+   * Activates or deactivates the air condition.
+   */
   @Override
   public void actuate() {
     togglePower();
