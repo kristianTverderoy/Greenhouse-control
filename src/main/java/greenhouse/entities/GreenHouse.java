@@ -18,11 +18,19 @@ public class GreenHouse {
   private Air air;
 
 
-  public GreenHouse(int greenHouseID) {
+  public GreenHouse(int greenHouseID) { // Used when creating greenhouse from scratch
     this.sensors = new ConcurrentHashMap<>();
     this.appliances = new ConcurrentHashMap<>();
     this.greenHouseID = greenHouseID;
     initiateAirAndSoil();
+  }
+
+  public GreenHouse(int greenHouseID, Soil soil, Air air) { // Used when creating greenhouse from JsonFile
+    this.sensors = new ConcurrentHashMap<>();
+    this.appliances = new ConcurrentHashMap<>();
+    this.greenHouseID = greenHouseID;
+    this.soil = soil;
+    this.air = air;
   }
 
   public void addSensor(Sensor<?> sensor) {
@@ -122,5 +130,41 @@ public class GreenHouse {
 
   public void actuateAppliance(int id) {
     this.appliances.get(id).actuate();
+  }
+
+  /**
+   * Gets the air object of this greenhouse.
+   *
+   * @return The air object
+   */
+  public Air getAir() {
+    return this.air;
+  }
+
+  /**
+   * Gets the soil object of this greenhouse.
+   *
+   * @return The soil object
+   */
+  public Soil getSoil() {
+    return this.soil;
+  }
+
+  /**
+   * Gets all sensors as a list.
+   *
+   * @return A list of all sensors
+   */
+  public java.util.List<Sensor<?>> getAllSensors() {
+    return new java.util.ArrayList<>(this.sensors.values());
+  }
+
+  /**
+   * Gets all appliances as a list.
+   *
+   * @return A list of all appliances
+   */
+  public java.util.List<Appliance> getAllAppliances() {
+    return new java.util.ArrayList<>(this.appliances.values());
   }
 }

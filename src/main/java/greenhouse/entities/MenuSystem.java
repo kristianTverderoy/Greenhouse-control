@@ -54,7 +54,7 @@ public class MenuSystem {
   public void showStartMenu(BufferedWriter writer) throws IOException {
     writer.write(server.encryptMessage("\nMenu:"));
     writer.newLine();
-    writer.write(server.encryptMessage("Commands: greenhouses | help | exit"));
+    writer.write(server.encryptMessage("Commands: greenhouses | saveserverstate | newgreenhouse | help | exit"));
     writer.newLine();
     writer.flush();
   }
