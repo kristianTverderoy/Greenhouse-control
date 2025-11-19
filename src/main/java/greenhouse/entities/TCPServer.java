@@ -321,6 +321,129 @@ public class TCPServer extends ClockSubscriber {
     }
   }
 
+  /**
+   * Updates the air temperature target of a specified greenhouse.
+   * @param greenhouseAndTempTargetValue the command string in the format: "updateTempTarget -<temperatureTarget> -<greenhouseId>"
+   * @throws NoExistingGreenHouseException if there are no existing greenhouses in the list
+   */
+  public void updateGreenhouseTempTarget(String greenhouseAndTempTargetValue) throws NoExistingGreenHouseException, IOException, IllegalArgumentException {
+    if (greenHouses.isEmpty()) {
+      throw new NoExistingGreenHouseException();
+    }
+      try {
+        String[] parts = greenhouseAndTempTargetValue.split("-");
+        double temperatureTarget = Double.parseDouble(parts[1]);
+        int greenhouseId = Integer.parseInt(parts[2].trim());
+
+        GreenHouse targetGreenhouse = greenHouses.stream()
+                .filter(gh -> gh.getID() == greenhouseId)
+                .findFirst()
+                .orElseThrow(NoExistingGreenHouseException::new);
+
+        targetGreenhouse.updateAirTemperatureTarget(temperatureTarget);
+      } catch (NumberFormatException e) {
+        throw new IllegalArgumentException("Invalid temperature target format.");
+      } catch (ArrayIndexOutOfBoundsException e) {
+        throw new IOException("The user did not follow the example for input");
+    }
+  }
+
+  /**
+   * Updates the air humidity target of a specified greenhouse.
+   * @param message the command string in the format: "updateHumidityTarget -<humidityTarget> -<greenhouseId>"
+   * @throws NoExistingGreenHouseException if there are no existing greenhouses in the list
+   * @throws IOException if the message format is incorrect
+   * @throws IllegalArgumentException if the humidity value format is invalid
+   */
+  public void updateGreenhouseHumidityTarget(String message) throws NoExistingGreenHouseException, IOException, IllegalArgumentException {
+    if (greenHouses.isEmpty()) {
+      throw new NoExistingGreenHouseException();
+    }
+    try {
+      String[] parts = message.split("-");
+      float humidityTarget = Float.parseFloat(parts[1].trim());
+      int greenhouseId = Integer.parseInt(parts[2].trim());
+
+      GreenHouse targetGreenhouse = greenHouses.stream()
+              .filter(gh -> gh.getID() == greenhouseId)
+              .findFirst()
+              .orElseThrow(NoExistingGreenHouseException::new);
+
+      targetGreenhouse.updateAirHumidityTarget(humidityTarget);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Invalid humidity target format.");
+    } catch (ArrayIndexOutOfBoundsException e) {
+      throw new IOException("The user did not follow the example for input");
+    }
+  }
+
+  /**
+   * Removes a sensor from a specified greenhouse.
+   * @param message the command string in the format: "removesensor -<sensorId> -<greenhouseId>"
+   * @throws NoExistingGreenHouseException if there are no existing greenhouses in the list
+   * @throws IOException if the message format is incorrect
+   * @throws IllegalArgumentException if the sensor ID is invalid or sensor not found
+   */
+  public void removeSensorFromGreenhouse(String message) throws NoExistingGreenHouseException, IOException, IllegalArgumentException {
+    if (greenHouses.isEmpty()) {
+      throw new NoExistingGreenHouseException();
+    }
+    try {
+      String[] parts = message.split("-");
+      int sensorId = Integer.parseInt(parts[1].trim());
+      int greenhouseId = Integer.parseInt(parts[2].trim());
+
+      GreenHouse targetGreenhouse = greenHouses.stream()
+              .filter(gh -> gh.getID() == greenhouseId)
+              .findFirst()
+              .orElseThrow(NoExistingGreenHouseException::new);
+
+      if (targetGreenhouse.getSensor(sensorId) == null) {
+        throw new IllegalArgumentException("Sensor not found with ID: " + sensorId);
+      }
+
+      targetGreenhouse.removeSensor(sensorId);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Invalid sensor ID format.");
+    } catch (ArrayIndexOutOfBoundsException e) {
+      throw new IOException("The user did not follow the example for input");
+    }
+  }
+
+  /**
+   * Removes an appliance from a specified greenhouse.
+   * @param message the command string in the format: "removeappliance -<applianceId> -<greenhouseId>"
+   * @throws NoExistingGreenHouseException if there are no existing greenhouses in the list
+   * @throws IOException if the message format is incorrect
+   * @throws IllegalArgumentException if the appliance ID is invalid or appliance not found
+   */
+  public void removeApplianceFromGreenhouse(String message) throws NoExistingGreenHouseException, IOException, IllegalArgumentException {
+    if (greenHouses.isEmpty()) {
+      throw new NoExistingGreenHouseException();
+    }
+    try {
+      String[] parts = message.split("-");
+      int applianceId = Integer.parseInt(parts[1].trim());
+      int greenhouseId = Integer.parseInt(parts[2].trim());
+
+      GreenHouse targetGreenhouse = greenHouses.stream()
+              .filter(gh -> gh.getID() == greenhouseId)
+              .findFirst()
+              .orElseThrow(NoExistingGreenHouseException::new);
+
+      if (targetGreenhouse.getAppliance(applianceId) == null) {
+        throw new IllegalArgumentException("Appliance not found with ID: " + applianceId);
+      }
+
+      targetGreenhouse.removeAppliance(applianceId);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Invalid appliance ID format.");
+    } catch (ArrayIndexOutOfBoundsException e) {
+      throw new IOException("The user did not follow the example for input");
+    }
+  }
+
+
   public void addAppliancesToGreenhouse(String message) throws ApplianceNotAddedToGreenHouseException, NoExistingGreenHouseException, IOException {
     if (greenHouses.isEmpty()){
       throw new NoExistingGreenHouseException();
