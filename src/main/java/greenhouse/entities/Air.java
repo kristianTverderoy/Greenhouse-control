@@ -61,7 +61,6 @@ public class Air extends ClockSubscriber implements Sensorable {
       actualTemperature = Math.random() * 40;
       initialTempSet = true;
     }
-
     updateLight();
     humidityChangeProbability();
     tempChangeProbability();
@@ -113,6 +112,7 @@ public class Air extends ClockSubscriber implements Sensorable {
     } else {
       humidity -= humidityChange;
     }
+    humidity = Math.max(0.0f, Math.min(1.0f, humidity));
     update();
   }
 
@@ -161,6 +161,18 @@ public class Air extends ClockSubscriber implements Sensorable {
    */
   public void setTargetTemperature(double newTemperatureTarget) {
     this.temperatureTarget = newTemperatureTarget;
+  }
+
+  /**
+   * Sets the targetHumidity to a new desired humidity.
+   */
+  public void setTargetHumidity(Float newHumidityTarget) {
+    if (newHumidityTarget > 1.0f){
+      this.humidityTarget = 1.0f;
+    } else if (newHumidityTarget < 0.0f){
+      this.humidityTarget = 0.0f;
+    } else
+    this.humidityTarget = newHumidityTarget;
   }
 
   public float getHumidity() {
