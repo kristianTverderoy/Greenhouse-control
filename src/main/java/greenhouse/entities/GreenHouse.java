@@ -206,4 +206,23 @@ public class GreenHouse {
   public void actuateAppliance(int id) {
     this.appliances.get(id).actuate();
   }
+
+  /**
+   * Updates the target temperature of the air in the greenhouse.
+   *
+   * @param targetTemperature The new target temperature for the air.
+   */
+  public void updateAirTemperatureTarget(double targetTemperature) {
+    this.air.setTargetTemperature(targetTemperature);
+  }
+
+  /**
+   * Updates the target humidity of the air in the greenhouse.
+   *
+   * @param targetHumidity The new target humidity for the air.
+   */
+  public void updateAirHumidityTarget(float targetHumidity) {
+    this.air.setTargetHumidity(targetHumidity);
+  };
+
 }
