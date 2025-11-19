@@ -20,6 +20,8 @@ public class GreenHouse {
   private final int greenHouseID;
   private Soil soil;
   private Air air;
+  private int nextSensorId = 0;
+  private int nextApplianceId = 0;
 
   /**
    * Creates an instance of the GreenHouse.
@@ -137,7 +139,7 @@ public class GreenHouse {
    * @return The next available id number for a sensor.
    */
   public int getNextAvailableSensorId(){
-    return sensors.size();
+    return this.nextSensorId++;
   }
 
   /**
@@ -148,7 +150,7 @@ public class GreenHouse {
    * @return The next available id number for an appliance.
    */
   public int getNextAvailableApplianceId(){
-    return appliances.size();
+    return this.nextApplianceId++;
   }
 
   public String getAllSensorsInformation() {
