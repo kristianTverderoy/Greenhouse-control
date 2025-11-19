@@ -6,6 +6,7 @@ import greenhouse.entities.sensors.Sensor;
 import greenhouse.entities.sensors.*;
 
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,12 +36,24 @@ public class GreenHouse {
     initiateAirAndSoil();
   }
 
-  public GreenHouse(int greenHouseID, Soil soil, Air air) { // Used when creating greenhouse from JsonFile
+  public GreenHouse(int greenHouseID, Soil soil, Air air, int nextSensorId, int nextApplianceId,
+                    List<Sensor<?>> sensors, List<Appliance> appliances) { // Used when creating greenhouse from JsonFile
     this.sensors = new ConcurrentHashMap<>();
     this.appliances = new ConcurrentHashMap<>();
     this.greenHouseID = greenHouseID;
     this.soil = soil;
     this.air = air;
+    this.nextSensorId = nextSensorId;
+    this.nextApplianceId = nextApplianceId;
+
+    // Add pre-created sensors with their original IDs
+    for (Sensor<?> sensor : sensors) {
+      this.sensors.put(sensor.getId(), sensor);
+    }
+    // Add pre-created appliances with their original IDs
+    for (Appliance appliance : appliances) {
+      this.appliances.put(appliance.getId(), appliance);
+    }
   }
 
   /**
@@ -267,6 +280,13 @@ public class GreenHouse {
    */
   public void updateAirHumidityTarget(float targetHumidity) {
     this.air.setTargetHumidity(targetHumidity);
-  };
+  }
 
+  public int getNextSensorId() {
+    return nextSensorId;
+  }
+
+  public int getNextApplianceId() {
+    return nextApplianceId;
+  }
 }
