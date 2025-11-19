@@ -85,7 +85,7 @@ public class JsonWriter {
     // Include air and soil state
     dto.setAir(convertAirToDTO(greenhouse.getAir()));
     dto.setSoil(convertSoilToDTO(greenhouse.getSoil()));
-    
+
     return dto;
   }
 
@@ -134,7 +134,7 @@ public class JsonWriter {
     if (parentDir != null && !parentDir.exists()) {
       parentDir.mkdirs();
     }
-    
+
     try (FileWriter writer = new FileWriter(filePath)) {
       gson.toJson(dto, writer);
     }
