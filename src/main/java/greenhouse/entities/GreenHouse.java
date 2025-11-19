@@ -129,7 +129,7 @@ public class GreenHouse {
    */
   private void initiateAirAndSoil() {
     this.soil = new Soil(50, 7, 20);
-    this.air = new Air(20, 60, 10000);
+    this.air = new Air(20, 0.6f, 10000);
   }
   /**
    * Due to zero-based indexing, the next available id is at the last id + 1.
