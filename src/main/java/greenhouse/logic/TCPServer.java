@@ -32,7 +32,7 @@ public class TCPServer extends ClockSubscriber {
   private volatile boolean isOn = false;
   private ServerSocket serverSocket;
   private final MenuSystem menuSystem;
-  private static final String ENCRYPTION_ALGORITHM = "AES";
+  private static final String ENCRYPTION_ALGORITHM = "AES"; //Encryption functionality is made using AI
   private static final SecretKey SECRET_KEY = new SecretKeySpec(Base64.getDecoder().decode("m0VxcSPFs+2cuMUfh6tjWMj90eihSDGpc1cLr/B9e1Y="), ENCRYPTION_ALGORITHM);
   private int activeMonitoringClients = 0;
   private final Map<BufferedWriter, Integer> clientGreenhouseMap = new ConcurrentHashMap<>();

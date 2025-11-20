@@ -21,7 +21,7 @@ public class TCPClient {
   private volatile boolean shouldReconnect = true;
   private static final int MAX_RECONNECT_ATTEMPTS = 5;
   private static final int INITIAL_DELAY_MS = 1000;
-  private static final String ENCRYPTION_ALGORITHM = "AES";
+  private static final String ENCRYPTION_ALGORITHM = "AES"; // Encryption functionality is made using AI
   private static final SecretKey SECRET_KEY = new SecretKeySpec(Base64.getDecoder().decode("m0VxcSPFs+2cuMUfh6tjWMj90eihSDGpc1cLr/B9e1Y="), ENCRYPTION_ALGORITHM);
 
   /**
