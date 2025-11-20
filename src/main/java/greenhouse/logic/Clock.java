@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class Clock {
   private static final int NORMAL = 10;
   private static final int MODERATE = 5;
-  private static final int FAST = 1;
+  private static final int FAST = 3;
   private ArrayList<Integer> speeds = new ArrayList<>(Arrays.asList(NORMAL, MODERATE, FAST));
   private int position;
   private int currentRate;
@@ -39,9 +39,9 @@ public class Clock {
    */
   public void start() {
     scheduler = Executors.newScheduledThreadPool(1);
-    scheduler.scheduleAtFixedRate(tick(), 0, NORMAL, TimeUnit.SECONDS);
+    scheduler.scheduleAtFixedRate(tick(), 0, FAST, TimeUnit.MINUTES); //can be changed to seconds/minutes for testing
     position = 0;
-    currentRate = NORMAL;
+    currentRate = FAST;
     on = true;
   }
 
