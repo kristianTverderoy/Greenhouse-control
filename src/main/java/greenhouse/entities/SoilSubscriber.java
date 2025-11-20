@@ -1,5 +1,7 @@
 package greenhouse.entities;
 
+import greenhouse.logic.Soil;
+
 /**
  * Represents all the sensors that is alerted when the Soil values
  * changes.

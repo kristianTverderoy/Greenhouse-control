@@ -1,4 +1,4 @@
-package greenhouse.entities.filehandling;
+package greenhouse.filehandling;
 
 import com.google.gson.Gson;
 import java.io.FileNotFoundException;
@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * Utility class for reading greenhouse data from JSON files using Gson.
  * Only reads from the resources/greenhouses directory.
+ * Created using AI.
  */
 public class JsonReader {
 

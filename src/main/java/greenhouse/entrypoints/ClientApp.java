@@ -1,6 +1,6 @@
-package greenhouse.entities.entrypoints;
+package greenhouse.entrypoints;
 
-import greenhouse.entities.TCPClient;
+import client.TCPClient;
 
 /**
  * The program's entrypoint where the purpose is to start a clientside communication with a server.

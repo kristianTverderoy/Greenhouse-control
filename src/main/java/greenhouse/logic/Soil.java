@@ -1,6 +1,9 @@
-package greenhouse.entities;
+package greenhouse.logic;
 
 import java.util.ArrayList;
+
+import greenhouse.entities.Sensorable;
+import greenhouse.entities.SoilSubscriber;
 
 /**
  * <p>
@@ -179,7 +182,7 @@ public class Soil extends ClockSubscriber implements Sensorable {
    * Updates the soilMoisture, nitrogen and phValue every time the clock ticks.
    */
   @Override
-  void tick() {
+  public void tick() {
     updateState();
   }
 

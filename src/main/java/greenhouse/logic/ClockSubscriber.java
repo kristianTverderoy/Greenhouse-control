@@ -1,4 +1,4 @@
-package greenhouse.entities;
+package greenhouse.logic;
 
 /**
  * Subscribes to the Clock and does an action when the clock ticks.

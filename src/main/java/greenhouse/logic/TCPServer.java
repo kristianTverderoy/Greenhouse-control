@@ -1,4 +1,4 @@
-package greenhouse.entities;
+package greenhouse.logic;
 
 
 import java.io.*;
@@ -12,18 +12,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import greenhouse.entities.appliances.*;
 import greenhouse.entities.sensors.*;
+import greenhouse.filehandling.AirDTO;
+import greenhouse.filehandling.ApplianceDTO;
+import greenhouse.filehandling.GreenHouseDTO;
+import greenhouse.filehandling.JsonReader;
+import greenhouse.filehandling.JsonWriter;
+import greenhouse.filehandling.SensorDTO;
+import greenhouse.filehandling.SoilDTO;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
-import greenhouse.entities.filehandling.GreenHouseDTO;
-import greenhouse.entities.filehandling.JsonReader;
-import greenhouse.entities.filehandling.JsonWriter;
-import greenhouse.entities.filehandling.SensorDTO;
-import greenhouse.entities.filehandling.SoilDTO;
-import greenhouse.entities.filehandling.AirDTO;
-import greenhouse.entities.filehandling.ApplianceDTO;
 
 public class TCPServer extends ClockSubscriber {
 
@@ -33,7 +32,7 @@ public class TCPServer extends ClockSubscriber {
   private volatile boolean isOn = false;
   private ServerSocket serverSocket;
   private final MenuSystem menuSystem;
-  private static final String ENCRYPTION_ALGORITHM = "AES";
+  private static final String ENCRYPTION_ALGORITHM = "AES"; //Encryption functionality is made using AI
   private static final SecretKey SECRET_KEY = new SecretKeySpec(Base64.getDecoder().decode("m0VxcSPFs+2cuMUfh6tjWMj90eihSDGpc1cLr/B9e1Y="), ENCRYPTION_ALGORITHM);
   private int activeMonitoringClients = 0;
   private final Map<BufferedWriter, Integer> clientGreenhouseMap = new ConcurrentHashMap<>();
@@ -57,8 +56,6 @@ public class TCPServer extends ClockSubscriber {
    * This method runs in a loop while the server is on, accepting and handling clients.
    * The server socket is closed when the server stops or an exception occurs.
    */
-
-  //TODO: Remove sout statements when no longer necessary for debugging.
   public void run() {
     if (!isOn) {
       startServer();
@@ -169,7 +166,6 @@ public class TCPServer extends ClockSubscriber {
    *                            </ul>
    * @return a string containing the sensor reading(s), or "Sensor not found with ID: <id>" if the sensor doesn't exist.
    */
-  //TODO: guard condition if no greenhouses
   public String handleSensorReadingRequest(String messageFromClient) throws NoExistingGreenHouseException, IOException, IllegalArgumentException {
     if (greenHouses.isEmpty()) {
       throw new NoExistingGreenHouseException();

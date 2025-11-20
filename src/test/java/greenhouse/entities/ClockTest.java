@@ -3,6 +3,8 @@ package greenhouse.entities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import greenhouse.logic.Clock;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

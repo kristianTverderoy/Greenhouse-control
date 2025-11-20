@@ -1,6 +1,6 @@
-package greenhouse.entities.entrypoints;
+package greenhouse.entrypoints;
 
-import greenhouse.entities.TCPServer;
+import greenhouse.logic.TCPServer;
 
 /**
  * The program's entrypoint where the purpose is to start a TCPServer and allow communication

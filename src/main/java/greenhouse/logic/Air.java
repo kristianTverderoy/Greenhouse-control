@@ -1,6 +1,9 @@
-package greenhouse.entities;
+package greenhouse.logic;
 
 import java.util.ArrayList;
+
+import greenhouse.entities.AirSubscriber;
+import greenhouse.entities.Sensorable;
 
 public class Air extends ClockSubscriber implements Sensorable {
 
@@ -35,7 +38,7 @@ public class Air extends ClockSubscriber implements Sensorable {
   }
 
   @Override
-  void tick() {
+  public void tick() {
     updateState();
   }
 

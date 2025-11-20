@@ -1,5 +1,7 @@
 package greenhouse.entities;
 
+import greenhouse.logic.Air;
+
 /**
  * Represents all the sensors that is alerted when the Air values
  * changes.

@@ -1,7 +1,7 @@
 package greenhouse.entities.sensors;
 
-import greenhouse.entities.Air;
 import greenhouse.entities.AirSubscriber;
+import greenhouse.logic.Air;
 
 /**
  * Represents a sensor which measures the temperature of air.
