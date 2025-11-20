@@ -1,0 +1,119 @@
+package greenhouse.util;
+
+/**
+ * Processes commands related to the Greenhouse system.
+ */
+public class CommandProcessor {
+
+  /**
+   * Responsible for extracting and returning manual information for a specific command.
+   *
+   * @param messageFromClient The full message from client.
+   * @return The manual information for the selected command.
+   */
+  public static String handleManualRequest(String messageFromClient){
+    try {
+      String[] parts = messageFromClient.split("-");
+      parts[1] = parts[1].trim().toLowerCase();
+
+      return switch (parts[1]) {
+        case "sensorreading" -> "To specify a sensor to receive information from. Use the command:"
+                + "sensorreading -<id>\n"
+                + "Where <id> is select sensor id to read from.\n"
+                + "To read all sensors from the selected greenhouse, type sensorreading -a\n"
+                + "Example: 'sensorreading -2' will read the sensor with id 2 in the greenhouse you're in the menu of."
+                + "Likewise, 'sensorreading -a' will read all sensors in the greenhouse you're in the menu of.";
+
+        case "addsensor" -> "To add a sensor to a greenhouse, use the command: "
+                + "addsensor -<type>.\n"
+                + "Where <type> is the type of sensor (e.g., temperature, humidity), \n"
+                + "Example: 'addsensor -temperaturesensor' will add a temperature sensor to the greenhouse"
+                +" you're in the menu of.\n"
+                + "To add multiple sensors at the same time, separate each type with a space.\n"
+                + "Example: 'addsensor -temperaturesensor humiditysensor phsensor'";
+
+        case "addappliance" -> "To add an appliance to a greenhouse, use the command: "
+                + "addappliance -<type>.\n"
+                + "Where <type> is the type of appliance (e.g., aircondition, lamp), \n"
+                + "Example: 'addappliance -lamp' will add a lamp to the greenhouse"
+                +" you're in the menu of.\n"
+                + "To add multiple appliances at the same time, separate each type with a space.\n"
+                + "Example: 'addappliance -lamp humidifier fertilizer'";
+
+        case "toggleappliance" -> "To toggle on/off an appliance, use the command: "
+                + "appliance -<number>.\n"
+                + "Where <number> is the id of the appliance you want to toggle (e.g 1), \n "
+                + "Example: 'toggleappliance -3' will toggle on/off the appliance with the id 3";
+
+        case "appliancereading" -> "To get the status of an appliance, use the command: "
+                + "appliancereading -<number>.\n"
+                + "Where <number> is the id of the appliance you want to get the status from (e.g 1), \n "
+                + "To read all appliances in the selected greenhouse, type appliancereading -a\n"
+                + "Example: 'appliancereading -3' will return the status of the appliance with the id 3 \n"
+                + "Likewise, 'appliancereading -a' will read all appliances in the greenhouse you're in the menu of.";
+
+        case "newtemptarget" -> "To set a new target temperature for the greenhouse, use the command: "
+                + "newtemptarget -<temperature>.\n"
+                + "Where <temperature> is the new target temperature you want to set (e.g 22.5), \n "
+                + "Example: 'newtemptarget -21.5' will set the target temperature of the greenhouse"
+                + " you're in the menu of to 21.5 degrees Celsius.";
+
+        case "newhumiditytarget" -> "To set a new target humidity for the greenhouse, use the command: "
+                + "newhumiditytarget -<humidity>.\n"
+                + "Where <humidity> is the new target humidity you want to set (e.g 0.65), \n "
+                + "Example: 'newhumiditytarget -0.70' will set the target humidity of the greenhouse"
+                + " you're in the menu of to 70%.";
+
+        case "removesensor" -> "To remove a sensor from the greenhouse, use the command: "
+                + "removesensor -<id>. \n"
+                + "Where <id> is the id of the sensor you want to remove from the greenhouse you're in. \n"
+                + "Example: 'removesensor -1' will remove the sensor with the id 1, from the greenhouse you're in the menu of.";
+
+        case "removeappliance" -> "To remove an appliance from the greenhouse, use the command: "
+                + "removeappliance -<id>. \n"
+                + "Where <id> is the id of the appliance you want to remove from the greenhouse you're in. \n"
+                + "Example: 'removesensor -3' will remove the sensor with the id 3, from the greenhouse you're in";
+
+        default -> "Did not find that item in 'man'.";
+      };
+    } catch (ArrayIndexOutOfBoundsException e) {
+      return """
+              Error: Please include '-' before command.
+              Example use: man -sensorreading
+              """;
+    }
+  }
+
+  /**
+   * Provides a full manual for the Greenhouse Server commands.
+   * @return A string containing the complete manual.
+   */
+  public static String getManual() {
+    return """
+      === Greenhouse Server Manual ===
+
+      General Commands:
+        manual/help       - Show this manual
+        greenhouses       - View and manage greenhouses
+        subscribe         - Subscribe to sensor updates
+        newgreenhouse     - Create a new greenhouse
+        exit              - Disconnect from server
+
+      Greenhouse Management:
+        newgreenhouse     - Create a new greenhouse
+        listgreenhouses   - List all greenhouses
+        <greenhouse_id>   - View details of a specific greenhouse
+       
+       
+      Sensor Management:
+       addsensor <type> <id> <greenhouse_id> - Add a sensor to a greenhouse
+       sensorreadings -'number' - View sensor readings for this sensor.
+       sensorreadings -'a' - View all sensor readings in this greenhouse.
+       
+        
+      Navigation:
+        back              - Return to previous menu
+      """;
+  }
+}
+

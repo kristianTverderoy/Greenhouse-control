@@ -1,98 +1,57 @@
 package greenhouse.entities.sensors;
 
-public abstract class Sensor<T> implements SensorContract<T>{
-  private String id;
-  private String type;
-  private String location;
-  private T currentReading;
-  private T minimumReading;
-  private T maximumReading;
-  private T averageReading;
-  private boolean isActive;
-  private boolean isConnected;
 
-  public Sensor(String type, String id, String location, T minimumReading, T maximumReading){
+/**
+ * Abstract base class for all sensor types in the greenhouse system.
+ * This class provides common functionality for managing sensor state, readings,
+ * and alert thresholds.
+ *
+ * @param <T> the type of data this sensor reads (e.g., Double, Integer)
+ */
+public abstract class Sensor<T> {
+  private int id;
+  private final String type;
+
+  /**
+   * Constructs a new Sensor with the specified parameters.
+   *
+   * @param type the type of sensor (e.g., "temperature", "humidity", "soil moisture")
+   * @param id the unique identifier for this sensor
+   */
+  public Sensor(String type, int id) {
     this.id = id;
     this.type = type;
-    this.location = location;
-    this.minimumReading = minimumReading;
-    this.maximumReading = maximumReading;
   }
-  @Override
-  public String getId() {
+
+  /**
+   * Sets the sensor's id to an int value.
+   *
+   * @param newId The new unique identifier to assign to this sensor.
+   */
+  public void setId(int newId) {
+    this.id = newId;
+  }
+
+  /**
+   * Gets the unique identifier of this sensor.
+   *
+   * @return the sensor's ID
+   */
+  public int getId() {
     return this.id;
   }
 
-  @Override
+
+  /**
+   * Gets the type of this sensor.
+   *
+   * @return the sensor type
+   */
   public String getType() {
-    return "";
+    return this.type;
   }
+
 
   @Override
-  public String getLocation() {
-    return "";
-  }
-
-  @Override
-  public T getCurrentReading() {
-    if (this.currentReading == null){
-      throw new SensorNotYetActiveException("Current reading can not be read if the sensor does not have a " +
-              "reading to give");
-    }
-    return currentReading;
-  }
-
-  @Override
-  public T getMinReading() {
-    return this.minimumReading;
-  }
-
-  @Override
-  public T getMaxReading() {
-    return this.maximumReading;
-  }
-
-  @Override
-  public T getAverageReading() {
-    if (this.averageReading == null){
-      throw new SensorNotYetActiveException("Average reading can not be read if the sensor does not have a" +
-              " reading to give");
-    }
-    return this.averageReading;
-  }
-
-  @Override
-  public boolean isActive() {
-    return this.isActive;
-  }
-
-  @Override
-  public boolean isConnected() {
-    return this.isConnected;
-  }
-
-  @Override
-  public void start() {
-
-  }
-
-  @Override
-  public void stop() {
-
-  }
-
-  @Override
-  public void reset() {
-
-  }
-
-  @Override
-  public void setThreshold(Object min, Object max) {
-
-  }
-
-  @Override
-  public boolean isInAlertState() {
-    return false;
-  }
+  public abstract String toString();
 }
