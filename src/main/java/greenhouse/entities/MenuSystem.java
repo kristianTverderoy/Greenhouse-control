@@ -9,8 +9,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
 
-import greenhouse.entities.appliances.*;
-
 /**
  * Manages the menu system for the greenhouse TCP server.
  * Handles user interaction through different menu levels including
