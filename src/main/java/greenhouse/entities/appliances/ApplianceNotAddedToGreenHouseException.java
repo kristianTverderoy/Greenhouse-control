@@ -4,6 +4,7 @@ package greenhouse.entities.appliances;
  * Exception thrown when an appliance cannot be added to a greenhouse.
  * This can occur due to various reasons such as duplicate appliance IDs,
  * invalid appliance configuration, or greenhouse capacity issues.
+ * Made using AI.
  */
 public class ApplianceNotAddedToGreenHouseException extends Exception {
 
