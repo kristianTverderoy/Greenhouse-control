@@ -57,8 +57,6 @@ public class TCPServer extends ClockSubscriber {
    * This method runs in a loop while the server is on, accepting and handling clients.
    * The server socket is closed when the server stops or an exception occurs.
    */
-
-  //TODO: Remove sout statements when no longer necessary for debugging.
   public void run() {
     if (!isOn) {
       startServer();
@@ -169,7 +167,6 @@ public class TCPServer extends ClockSubscriber {
    *                            </ul>
    * @return a string containing the sensor reading(s), or "Sensor not found with ID: <id>" if the sensor doesn't exist.
    */
-  //TODO: guard condition if no greenhouses
   public String handleSensorReadingRequest(String messageFromClient) throws NoExistingGreenHouseException, IOException, IllegalArgumentException {
     if (greenHouses.isEmpty()) {
       throw new NoExistingGreenHouseException();

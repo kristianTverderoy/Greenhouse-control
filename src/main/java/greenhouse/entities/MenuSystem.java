@@ -11,8 +11,6 @@ import java.util.List;
 
 import greenhouse.entities.appliances.*;
 
-//TODO: Klasse skal i util pakke, eller ui pakke?
-
 /**
  * Manages the menu system for the greenhouse TCP server.
  * Handles user interaction through different menu levels including
