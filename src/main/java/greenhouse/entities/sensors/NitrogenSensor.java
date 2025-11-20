@@ -1,7 +1,7 @@
 package greenhouse.entities.sensors;
 
-import greenhouse.entities.Soil;
 import greenhouse.entities.SoilSubscriber;
+import greenhouse.logic.Soil;
 
 /**
  * Represents a sensor measuring nitrogen in soil.

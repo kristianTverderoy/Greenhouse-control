@@ -1,13 +1,14 @@
-package greenhouse.entities.filehandling;
+package greenhouse.filehandling;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import greenhouse.entities.Air;
-import greenhouse.entities.GreenHouse;
-import greenhouse.entities.Soil;
+
 import greenhouse.entities.appliances.Appliance;
 import greenhouse.entities.appliances.AirAppliance;
 import greenhouse.entities.sensors.Sensor;
+import greenhouse.logic.Air;
+import greenhouse.logic.GreenHouse;
+import greenhouse.logic.Soil;
 
 import java.io.File;
 import java.io.FileWriter;

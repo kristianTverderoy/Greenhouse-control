@@ -1,6 +1,6 @@
 package greenhouse.entities.appliances;
 
-import greenhouse.entities.Soil;
+import greenhouse.logic.Soil;
 
 /**
  * Represents a machine that does actions to the soil

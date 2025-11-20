@@ -1,10 +1,11 @@
-package greenhouse.entities;
+package greenhouse.logic;
 
+import greenhouse.entities.AirSubscriber;
+import greenhouse.entities.SoilSubscriber;
 import greenhouse.entities.appliances.Appliance;
 import greenhouse.entities.appliances.SoilAppliance;
 import greenhouse.entities.sensors.Sensor;
 import greenhouse.entities.sensors.*;
-
 
 import java.util.List;
 import java.util.Map;

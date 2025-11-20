@@ -1,4 +1,4 @@
-package greenhouse.entities.filehandling;
+package greenhouse.filehandling;
 
 import com.google.gson.Gson;
 import java.io.FileNotFoundException;

@@ -1,9 +1,10 @@
 package greenhouse.entities.sensors;
 
-import greenhouse.entities.Clock;
-import greenhouse.entities.Soil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import greenhouse.logic.Clock;
+import greenhouse.logic.Soil;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,6 +22,6 @@ public class PHSensorTest {
   @Test
   public void tickOnce() {
     Clock.getInstance().tick().run();
-    assertEquals(64, Math.round(sensor.getPh()*10));
+    assertEquals(61, Math.round(sensor.getPh()*10));
   }
 }

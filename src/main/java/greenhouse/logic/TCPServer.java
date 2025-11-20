@@ -1,4 +1,4 @@
-package greenhouse.entities;
+package greenhouse.logic;
 
 
 import java.io.*;
@@ -12,18 +12,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import greenhouse.entities.appliances.*;
 import greenhouse.entities.sensors.*;
+import greenhouse.filehandling.AirDTO;
+import greenhouse.filehandling.ApplianceDTO;
+import greenhouse.filehandling.GreenHouseDTO;
+import greenhouse.filehandling.JsonReader;
+import greenhouse.filehandling.JsonWriter;
+import greenhouse.filehandling.SensorDTO;
+import greenhouse.filehandling.SoilDTO;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
-import greenhouse.entities.filehandling.GreenHouseDTO;
-import greenhouse.entities.filehandling.JsonReader;
-import greenhouse.entities.filehandling.JsonWriter;
-import greenhouse.entities.filehandling.SensorDTO;
-import greenhouse.entities.filehandling.SoilDTO;
-import greenhouse.entities.filehandling.AirDTO;
-import greenhouse.entities.filehandling.ApplianceDTO;
 
 public class TCPServer extends ClockSubscriber {
 

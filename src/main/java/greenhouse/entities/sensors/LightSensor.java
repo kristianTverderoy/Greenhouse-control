@@ -1,7 +1,7 @@
 package greenhouse.entities.sensors;
 
-import greenhouse.entities.Air;
 import greenhouse.entities.AirSubscriber;
+import greenhouse.logic.Air;
 
 /**
  * Represents a light sensor in a green house.

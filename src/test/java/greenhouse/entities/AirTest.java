@@ -4,6 +4,8 @@ package greenhouse.entities;
 
 import org.junit.jupiter.api.Test;
 
+import greenhouse.logic.Air;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AirTest {

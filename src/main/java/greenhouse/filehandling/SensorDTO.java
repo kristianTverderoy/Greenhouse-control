@@ -1,4 +1,4 @@
-package greenhouse.entities.filehandling;
+package greenhouse.filehandling;
 
 /**
  * Data Transfer Object for sensor data.

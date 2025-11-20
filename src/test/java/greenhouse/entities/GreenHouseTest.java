@@ -4,6 +4,9 @@ import greenhouse.entities.appliances.*;
 import greenhouse.entities.sensors.MoistureSensor;
 import greenhouse.entities.sensors.NitrogenSensor;
 import greenhouse.entities.sensors.PHSensor;
+import greenhouse.logic.Clock;
+import greenhouse.logic.GreenHouse;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

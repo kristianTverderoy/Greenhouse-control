@@ -1,4 +1,4 @@
-package greenhouse.entities;
+package greenhouse.logic;
 
 /**
  * If a green house hasn't been created, this exception is thrown.

@@ -1,4 +1,4 @@
-package greenhouse.entities;
+package greenhouse.logic;
 
 import java.util.ArrayList;
 import java.util.Arrays;

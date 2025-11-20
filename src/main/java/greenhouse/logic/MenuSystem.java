@@ -1,4 +1,4 @@
-package greenhouse.entities;
+package greenhouse.logic;
 
 import greenhouse.util.CommandProcessor;
 import greenhouse.entities.appliances.ApplianceNotAddedToGreenHouseException;
