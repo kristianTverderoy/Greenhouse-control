@@ -17,6 +17,7 @@ import java.util.List;
 
 /**
  * Utility class for writing greenhouse data to JSON files using Gson.
+ * Partly made using AI.
  */
 public class JsonWriter {
 
