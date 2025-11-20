@@ -271,7 +271,7 @@ public class TCPServer extends ClockSubscriber {
     try {
       GreenHouse gh;
       if (!greenHouses.isEmpty()) {
-        gh = new GreenHouse(greenHouses.getLast().getID() + 1);
+        gh = new GreenHouse(greenHouses.get(greenHouses.size() - 1).getID() + 1);
 
       } else {
         gh = new GreenHouse(0);
@@ -526,12 +526,23 @@ public class TCPServer extends ClockSubscriber {
 
   /**
    * Removes a subscriber from the subscriber list.
+   * If this is the last subscriber, saves all greenhouses to persistent storage.
    *
    * @param subscriber the subscriber to be removed
    */
   private void removeSubscriber(Socket subscriber) {
     this.subscribedClients.removeIf(
             clientConnection -> clientConnection.socket().equals(subscriber));
+    
+    // Save greenhouses when the last user disconnects
+    if (this.subscribedClients.isEmpty()) {
+      try {
+        saveAllGreenHouses();
+        System.out.println("All greenhouses saved after last client disconnected.");
+      } catch (IOException e) {
+        System.err.println("Failed to save greenhouses after last client disconnected: " + e.getMessage());
+      }
+    }
   }
 
   public void sendMessageToClient(Socket clientSocket, BufferedWriter writer, String message) throws IOException {
@@ -592,6 +603,7 @@ public class TCPServer extends ClockSubscriber {
    * <p>
    * If a notification fails to be sent to a subscriber,
    * it's assumed the subscriber is no longer reachable and is removed from the list.
+   * If this results in no connected clients, saves all greenhouses to persistent storage.
    */
   public void notifySubscribers(String updateMessage) {
     subscribedClients.removeIf(clientConnection -> {
@@ -604,6 +616,16 @@ public class TCPServer extends ClockSubscriber {
         return true; // There was an error in notifying the subscriber, so we remove it.
       }
     });
+    
+    // Save greenhouses when the last user disconnects
+    if (this.subscribedClients.isEmpty()) {
+      try {
+        saveAllGreenHouses();
+        System.out.println("All greenhouses saved after last client disconnected.");
+      } catch (IOException e) {
+        System.err.println("Failed to save greenhouses after last client disconnected: " + e.getMessage());
+      }
+    }
   }
 
   /**
