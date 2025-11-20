@@ -378,6 +378,15 @@ public class MenuSystem {
     }
   }
 
+  /**
+   * Handles the sensor monitoring menu for a specific greenhouse.
+   * Allows users to get a continuous flow of sensor data.
+   *
+   * @param gh     the greenhouse to display details from
+   * @param reader the buffered reader to read user input from
+   * @param writer the buffered writer to send output to the client
+   * @throws IOException if an I/O error occurs during communication
+   */
   private void handleGreenhouseSensorMonitoring(GreenHouse gh, BufferedWriter writer, BufferedReader reader) throws IOException {
     writer.write(server.encryptMessage("Sensor monitoring started for Greenhouse " + gh.getID()));
     writer.newLine();
